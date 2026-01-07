@@ -1,0 +1,251 @@
+This note is to solve a model with one-period debt and no sunspot. It’s
+I’ll just write the model equations and then describe a
+
+a starting point.
+solution algorithm. I’m using the same notation as in the JPE paper.
+
++ βg1−γE (cid:2)max (cid:8)vnd(b′, g′, ϵ′), vd(b′, g′, ϵ′)(cid:9) |g(cid:3)
+
+(cid:27)
+
+(1)
+
+1 Model
+
+Value of no default.
+
+vnd(b, g, ϵ) = max
+c,n
+
+(cid:26) c1−γ
+1 − γ
+
+c + b = y + n
+
+gb′ = R(n, g)n
+
+y = geσϵ
+
+n ≤ ¯n(g)
+
+Value of default
+
+vd(b, g, ϵ) =
+
+c1−γ
+1 − γ
+
+(cid:104)
++ βg1−γE
+θvd(b′, g′, ϵ′)
+
++ (1 − θ) max (cid:8)vnd(κb′, g′, ϵ′), vd(b′, g′, ϵ′)(cid:9) |g
+
+(2)
+
+(cid:105)
+
+c = ϕ(g)y
+
+gb′ = b
+
+y = geσϵ
+
+Schedule
+
+1 =
+
+R(n, g)
+1 + r∗
+
+E[Q(b′, g′, ϵ′)|g]
+
+gb′ = R(n, g)n
+
+(3)
+
+(4)
+
+1
+
+Prices
+
+Q(b, g, ϵ) = [1 − d(b, g, ϵ)] + d(b, g, ϵ)X(b, g, ϵ)
+
+X(b, g, ϵ) =
+
+(cid:104)
+E
+
+1
+1 + r∗
+
+θX(b′, g′, ϵ′) + (1 − θ)×
+
+{[1 − e(b′, g′, ϵ′)] X(b′, g′, ϵ′) + e(b′, g′, ϵ′)κQ(κb′, g′, ϵ′)} |g
+
+(5)
+
+(6)
+
+(cid:105)
+
+with b′ = b/g in equation (6).
+
+The default and re-entry decisions, d(b, g, ϵ) and e(b, g, ϵ), are given as
+
+
+
+
+0,
+
+d(b, g, ϵ) =
+
+if vnd(b, g, ϵ) ≥ vd(b, gϵ),
+
+
+
+1, otherwise;
+
+
+
+
+1,
+
+e(b, g, ϵ) =
+
+if vnd(b, g, ϵ) ≥ vd(b, g, ϵ),
+
+
+
+0, otherwise.
+
+(7)
+
+(8)
+
+1.1 Solution algorithm
+
+Step 0: Set grids. Grid for debt, ⃗b = {b1, b2, . . . , bNb}, with b1 < 0 (saving)
+and bNb > 0 (borrowing). Grid for endowment shocks, ⃗ϵ = {ϵ1, ϵ2, . . . , ϵNϵ}.
+The values for b1 and bNb it’s trial and error. We want them large enough
+to not restrict the problem, but not more than needed. Having a simulation
+to text this may be a god idea. Nb should be large because we restrict choices
+to be in ⃗b. We used Nb = 7350 in the paper. We can probably do less with
+one period debt, but should still be in the thousands.
+
+For ⃗ϵ let’s do the same as in the paper: Nϵ = 17 and use Tauchen method.
+We also need ⃗g = {gL, gH}, the transition matrix Pg(g′|g), and the vari-
+
+ance σϵ. All these numbers come from the estimation (see Table).
+
+Step 1: Guess vnd(b, g, ϵ).
+Step 2: Given vnd(b, g, ϵ), solve for vd(b, g, ϵ). Note that, given vnd(b, g, ϵ),
+equation (2) is a fixed point in vd(b, g, ϵ). Iterate on equation (2) until vd(·)
+convergences.
+
+Note that we need to evaluate vd(b, g, ϵ) for values b′ = b/g and b′ =
+κb/g. These values may not be in the grid. Take the closest value in the
+
+2
+
+grid. A good example of why we need a large Nb is so that this approximation
+is never too off.
+
+Step 3: Given vnd(b, g, ϵ) and vd(b, g, ϵ), compute d(b, g, ϵ) and e(b, g, ϵ)
+
+as in equations (7)-(8).
+
+Step 4: Given d(b, g, ϵ) and e(b, g, ϵ), we solve for the prices Q(b, g, s) and
+
+X(b, g, ϵ).
+
+In particular, guess X(b, g, ϵ) and compute Q(b, g, ϵ) using equation (5). Then
+
+compute the implied X(b, g, ϵ) using equation (6).
+verges.
+
+Iterate until X(·) con-
+
+As in Step 2, we will have to evaluate Q(b, g, ϵ) for values b′ = b/g and
+b′ = κb/g likely outside the grid. As before, take the closest grid point
+available.
+
+Step 5: We need to compute the schedule R(n, g). This is the hardest
+step, even if we don’t currently have the sunspot. The computations below
+is for a given g.
+
+Fix a debt value for next period b′ ∈ ⃗b. Say it’s the ith position, so
+that b′ = bi. Next, compute the expected price tomorrow associated with
+b′ = bi. That is: QE
+
+i (g) = E[Q(bi, g′, ϵ′)|g].
+
+Next, we use equations (3)-(4) to compute the schedule. Given QE
+
+i (g),
+we obtain Ri(g) = 1+r∗
+i (g) . Then, we compute the implied issuance ni(g) =
+QE
+gbi
+Ri(g) . Then, (Ri(g), ni(g)) is a point in the schedule for current growth level
+g.
+
+We do this for i = 1, . . . , Nb and obtain the schedule S(g) = {Ri(g), ni(g)}Nb
+
+i=1. Note
+
+that, for a given Ri we obtain a unique ni. But may find the same (or similar)
+ni in S. Hence the multiplicity.
+
+Compute expected default probability pi(g) = E[d(bi, g, ϵ)|g]. We will
+impose an upper bound pub on schedule choices based on this default proba-
+bility.
+
+Step 6: Now we update vnd(b, g, ϵ). For given current states {b, g, ϵ},we
+
+do as follows.
+
+Given our current guess vnd(·), compute the expected value w(b, g, ϵ) =
+max (cid:8)vnd(b, g, ϵ), vd(b, g, ϵ)(cid:9), and the expected value wE(b, g) = E [w(b, g′, ϵ′)|g].
+Take the schedule of Step 5, S(g). Evaluate all values in the schedule
+
+3
+
+such that default probabilities are below pub. That is, for each b′ = bi ∈ ⃗b,
+evaluate the value of the policy
+
+ˆvnd
+i (b, g, ϵ) =
+
+[geσϵ + ni − b]1−γ
+1 − γ
+
++ βg1−γwE(bi, g)
+
+(9)
+
+Then, the implied vnd(·) is the maximum over bi such that default prob-
+
+ability is below pub
+
+ˆvnd(b, g, ϵ) = max
+
+i
+
+(cid:8)ˆvnd
+
+i (b, g, ϵ)s. to pi ≤ pub
+
+(cid:9)
+
+(10)
+
+Compare ˆvnd(b, g, ϵ) to the initial guess vnd(b, g, s).
+done. Otherwise, update vnd(b, g, s) and go back to Step 2.
+
+If it’s close, we are
+
+4
+
+

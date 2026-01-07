@@ -1,0 +1,342 @@
+%2multibyte Version: 5.50.0.2960 CodePage: 1252
+
+\documentclass{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+\setcounter{MaxMatrixCols}{10}
+%TCIDATA{OutputFilter=LATEX.DLL}
+%TCIDATA{Version=5.50.0.2960}
+%TCIDATA{Codepage=1252}
+%TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
+%TCIDATA{BibliographyScheme=Manual}
+%TCIDATA{Created=Wednesday, November 15, 2023 18:40:15}
+%TCIDATA{LastRevised=Tuesday, November 21, 2023 17:59:42}
+%TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
+%TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
+%TCIDATA{CSTFile=40 LaTeX article.cst}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{solution}[theorem]{Solution}
+\newtheorem{summary}[theorem]{Summary}
+\newenvironment{proof}[1][Proof]{\noindent\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+\input{tcilatex}
+\begin{document}
+
+
+\section{\textbf{A two period model:}}
+
+The economy is populated by a representative agent that draws utility from
+consumption in each period, and by a continuum of risk-neutral foreign
+lenders.
+
+The representative agent preferences are given by 
+\begin{equation*}
+u(c_{1})+\beta \mathbb{E}u(c_{2}),
+\end{equation*}
+where $u$ is strictly increasing, strictly concave and satisfies standard
+Inada conditions.
+
+The initial wealth of the agent is denoted by $\varepsilon ,$ which we take
+it to be arbitrarily small. The endowment in the second period is
+distributed according to 
+\begin{equation*}
+y_{2}=%
+\begin{cases}
+y^{l}, & \text{ with probability }p \\ 
+y^{h}, & \text{ with probability }\left( 1-p\right)%
+\end{cases}%
+\end{equation*}%
+in which $y^{l}<y^{h}$. As the initial wealth is low, the agent will want to
+borrow.
+
+\subsection{The "catalytic" lender of last resort.}
+
+We assume there is an international non-for profit institution (the European
+Central Bank or the International Monetary Fund) that is willing to lend an
+amount $b^{o}$ at an interest rate $R^{o}.$ We will focus only on cases in
+which $R^{o}\geq R^{\ast },$ where $R^{\ast }$ is an international risk free
+rate.
+
+We will study how the set of equilibria depends on these two policy
+instruments, $(b^{o},R^{o}).$ We denote this international institution as
+LOLR
+
+\subsection{Private Lenders}
+
+Assume first that $R^{o}=R^{\ast }.$
+
+In period one, the borrower moves first and issues a non-contingent debt
+level $b$. Lenders respond with an interest rate $R$. As $R=R^{\ast },$
+without loss of generality, the country would first borrow from the LOLR up
+to the maximum, and then will borrow the rest from private agents.
+
+We denote by $R(b,b^{o})$ the interest rate schedule faced by the borrower.
+In period two, after observing the endowment $y_{2}$, the borrower decides
+whether to pay the debt or to default. In case of repayment, the borrower
+consumes the endowment net of debt repayment, $c_{2}=y_{2}-\left[ R^{\ast
+}b^{o}+R(b-b^{o})\right] $. In case of default, consumption is $c_{2}=y^{d}$%
+. The agent defaults if the cost of repayment is larger than the benefit: 
+\begin{equation*}
+\underbrace{\left[ R^{\ast }b^{o}+R(b-b^{o})\right] }_{\text{cost of
+repayment}}>\underbrace{y_{2}-y^{d}}_{\text{benefit of repayment}}.
+\end{equation*}
+
+In the first period, given initial wealth $\varepsilon $ and an interest
+rate schedule $R(b,b^{o})$, the borrower solves the following problem 
+\begin{align}
+V(\omega )& =\max_{b}\left\{ u(c_{1})+\beta \mathbb{E}u(c_{2})\right\} ,
+\label{eq:HH} \\
+\text{subject to~~}& c_{1}=\omega +b,  \notag \\
+& c_{2}=\max \left\{ y_{2}-\left[ R^{\ast }b^{o}+R(b-b^{o})\right]
+,y^{d}\right\} ,  \notag
+\end{align}%
+and subject to a maximum debt level constraint, $b\leq \overline{B}$.
+
+The assumption that the borrower moves first by choosing a level of debt and
+that lenders move next with an interest rate schedule is standard. We depart
+from the literature, as in \citet{Aguiar+Gopinath:2006} and %
+\citet{Arellano:2008}, in that we assume that the borrower chooses current
+debt $b$, rather than debt at maturity, $Rb$. The risk-neutral lenders will
+be willing to lend to the agent as long as the expected return is the same
+as the risk-free rate $R^{\ast }$, that is, 
+\begin{equation}
+R^{\ast }=h(R;b,b^{o})\equiv \left[ 1-\Pr \left( y_{2}-y^{d}<\left[ R^{\ast
+}b^{o}+R(b-b^{o})\right] \right) \right] R,  \label{eq:exp_ret1}
+\end{equation}%
+in which $h(R;b,b^{o})$ is the expected return to the lender when the
+interest rate is $R$. Given a value for $b$, the expected return for lenders
+can be written as 
+\begin{equation}
+h(R;b)=%
+\begin{cases}
+R, & \text{ if }\left[ R^{\ast }b^{o}+R(b-b^{o})\right] \leq y^{l}-y^{d} \\ 
+R\text{ }(1-p), & \text{ if }y^{l}-y^{d}<\left[ R^{\ast }b^{o}+R(b-b^{o})%
+\right] \leq y^{h}-y^{d} \\ 
+0, & \text{ if }\left[ R^{\ast }b^{o}+R(b-b^{o})\right] >y^{h}-y^{d}.%
+\end{cases}
+\label{eq:exp_ret2}
+\end{equation}
+
+\subsubsection{The case $b^{o}=0.\,$}
+
+In Figure \ref{fig:exp_return}, we plot the expected return as a function of
+the interest rate $R$, for three levels of debt, together with the risk-free
+rate $R^{\ast }$. Notice that for low levels of $R$, the expected return is
+equal to $R$ since debt is repaid with probability one. In this region, as $%
+R $ increases, the expected return increases one to one. Eventually, $R$
+will be high enough that the borrower will default in the low output state,
+which happens with probability $p$. At this point, the expected return jumps
+down. As $R$ increases, the expected return increases at a lower rate, $%
+(1-p) $, since repayment happens only in the high output state. Finally, for
+high enough $R$, default will happen with probability one and the expected
+return will be zero. A higher level of debt decreases the expected return,
+uniformly, shifting the curves downwards.
+
+%% Figure - expected return (different b's)
+%\begin{figure}[h!]
+%\caption{Expected return function for different levels of debt}\label{fig:exp_return}
+%\subfloat[low debt]{ \includegraphics[scale=1.0]{Figures_2States2Periods/Figures/fig_exp_return_low_b} \label{fig:exp_return_low_b}} \\[1.5ex]
+%\subfloat[medium debt]{ \includegraphics[scale=1.0]{Figures_2States2Periods/Figures/fig_exp_return_medium_b} \label{fig:exp_return_medium_b}} \\[1.5ex]
+%\subfloat[high debt]{ \includegraphics[scale=1.0]{Figures_2States2Periods/Figures/fig_exp_return_high_b} \label{fig:exp_return_high_b}}
+%\end{figure}
+
+For low levels of debt, there is only one solution to equation %
+\eqref{eq:exp_ret1}, with $R=R^{\ast}$. For intermediate levels of debt,
+there are two solutions: one solution has $R=R^{\ast}$ associated with zero
+probability of default, the other has $R=R^{\ast}/(1-p)$ associated with
+probability of default equal to $p$. For higher levels of debt, the only
+solution is the high rate $R=R^{\ast}/(1-p)$. Finally, for even higher debt,
+there is no solution. There are multiple solutions only for intermediate
+levels of debt.
+
+We can now define the following correspondence relating debt levels to
+interest rates, 
+\begin{equation}  \label{eq:correspondence}
+\mathcal{R}(b) = 
+\begin{cases}
+R^{\ast }, & \text{ if } b\leq \frac{y^{l}-y^{d}}{R^{\ast }} \\ 
+\frac{R^{\ast }}{1-p}, & \text{ if } \frac{y^{l}-y^{d}}{R^{\ast }/(1-p)}%
+<b\leq \frac{y^{h}-y^{d}}{R^{\ast }/(1-p)} \\ 
+\infty , & \text{ if }b>\frac{y^{h}-y^{d}}{R^{\ast }/(1-p)}%
+\end{cases}%
+\end{equation}
+
+An equilibrium is an interest rate schedule $R(b)$ and a debt policy
+function $b(\omega)$ such that, given the schedule, the debt policy function
+solves the problem of the borrower in \eqref{eq:HH}, and the schedule $R(b)$
+is a selection of the correspondence $\mathcal{R}(b)$.
+
+The correspondence $\mathcal{R}(b)$ is plotted in Figure \ref{fig:schedules}%
+. For all debt levels below $b_{1} \equiv \frac{y^{l}-y^{d}}{R^{\ast }/(1-p)}
+$, there is only one interest rate, the risk-free rate. For debt levels
+between $b_{1}$ and $b_{2} \equiv \frac{y^{l}-y^{d}}{R^{\ast }}$, there are
+two possible interest rates, the risk-free rate and a high rate. For debt
+levels between $b_{2}$ and $\overline{b}\equiv \frac{y^{h}-y^{d}}{R^{\ast
+}/(1-p)}$ there is again only one interest rate, the high rate. There are
+multiple interest rate schedules that can be selected from this
+correspondence. We focus on two of those schedules: a low interest rate
+schedule, $R^{low}(b)$ in Figure \ref{fig:schedule_low}, and a high interest
+rate schedule, $R^{high}(b)$ in Figure \ref{fig:schedule_high}. We think of $%
+b_{1}$ as the debt level above which interest rates jump because of
+expectations, since alternative expectations could sustain low interest
+rates. We think of $b_{2}$ as the debt level above which interest rates jump
+because of fundamentals, since no expectations could sustain lower interest
+rates.
+
+Whether spreads are low or high has implications for the level of debt that
+can be raised. The region of multiplicity happens for intermediate levels of
+debt, between $b_{1}$ and $b_{2}$. If debt is sufficiently low, interest
+rates can only be low, while if debt is sufficiently high, rates can only be
+high. It is for intermediate levels of debt that interest rates can be
+either high or low depending on expectations.
+
+%% Figure - interest rate schedules
+%\begin{figure}[h!]
+%\caption{Interest rate schedules}\label{fig:schedules}
+%\subfloat [low interest rate schedule \label{fig:schedule_low}]{ \includegraphics[scale=1.0]{Figures_2States2Periods/Figures/fig_schedule_low}} \\[0ex]
+%\subfloat [high interest rate schedule \label{fig:schedule_high}]{ \includegraphics[scale=1.0]{Figures_2States2Periods/Figures/fig_schedule_high}}
+%\end{figure}
+%
+%% Figure - policy function
+%\begin{figure}[h!]
+%\caption{Debt policy function}\label{fig:polfcn}
+%\includegraphics[scale=1.0]{Figures_2States2Periods/Figures/fig_polfcn2}
+%\end{figure}
+
+Figure \ref{fig:polfcn} shows the optimal debt policy as a function of the
+initial wealth for the high and low interest rate schedules. For high levels
+of wealth, the optimal choice of debt is below $b_{1}$ regardless of which
+schedule the borrower is facing. As wealth decreases, the schedule matters.
+For the high interest rate schedule, the borrower chooses to keep debt
+levels at $b_{1}$ in order to avoid the discrete jump in interest rates on
+the whole level of debt. Eventually, for low enough wealth, the marginal
+utility in the first period is high enough that the borrower chooses to
+increase its debt level discretely. This discrete jump shows that the
+borrower has incentives to avoid at least part of the multiplicity region
+between $b_{1}$ and $b_{2}$. As wealth decreases even more, debt levels keep
+increasing until they reach the borrowing limit $\overline{b}$. When facing
+the low interest rate schedule, borrowing keeps on increasing as wealth
+declines until it reaches the level $b_{2}$. At this point, there is a
+choice to keep it constant for lower levels of wealth. Eventually, there is
+also a discrete jump, and debt continues to increase until they reach the
+borrowing limit.
+
+The choice of keeping debt levels constant as wealth decreases is a form of
+endogenous austerity. This happens in our model because of the discrete
+jumps in interest rates induced by both expectations and
+
+\subsubsection{The case $b^{o}>0.\,$}
+
+As we are interested in exploring policies that may rule out bad equilibria
+without the LOLR\ loosing money, we will focus only on the cases for which
+there is multiple equilibria, as depicted in Figure XXX. Notice that the
+good equilibrium implies that there is never default, so the equilibrium
+interest rate faced by the country satisfies $R=R^{\ast }.$
+
+Consider now the case in which the policy parameter $b^{o}$ is strictly
+positive. As before, we first study the function $h(R;b,b^{o}),$ which is
+the expected return to the lender when the interest rate is $R.$
+
+As shown in Figure XXX, there are two thresholds that matter: the first is
+the value for $R$ such that the country is indifferent between paying the
+debt and defaulting in the low income state. For lower values of this
+threshold, the country pays in both states of nature and the return is $R.$
+The second threshold is the - higher - value for $R$ such that the country
+is indifferent between \bigskip paying the debt and defaulting in the high
+income state. The country only defaults in the low income state if $R$ is in
+between the thresholds, so the expected return is $(1-p)R.$ Finally, the
+country defaults in every state for interest rates higher that the second
+threshold, so the return is zero.
+
+To understand the effect of the policy parameter $b^{o},$ we therefore only
+need to understand how it changes the two thresholds.
+
+The first threshold is defined by the value for $R^{T_{1}}$ equality 
+\begin{equation*}
+R^{\ast }b^{o}+R^{T_{1}}(b-b^{o})=y^{l}-y^{d},
+\end{equation*}%
+which implies 
+\begin{equation*}
+R^{T_{1}}=\frac{y^{l}-y^{d}-R^{\ast }b^{o}}{\left( b-b^{o}\right) }%
+=R^{T_{1}}(b,b^{o}).
+\end{equation*}%
+Notice that%
+\begin{equation*}
+\frac{\partial R^{T_{1}}}{\partial b^{0}}=\frac{\left[ y^{l}-y^{d}-bR^{\ast }%
+\right] }{\left( b-b^{o}\right) ^{2}}
+\end{equation*}%
+As we assumed that $b$ was such that the good - and the bad - equilibrium
+exists, then $\left[ y^{l}-y^{d}-bR^{\ast }\right] >0,$ so the derivative is
+positive. Thus, as $b^{0}$ is increased, the threshold $R^{T_{1}}$ moves to
+the rigth - i.e., it increases.
+
+Thus, this "catalytic" policy has the same effect on the thresholds as a
+reduction in total debt. Thus, it moves the multiplicity region to the
+right. Therefore, there is a potential effect on the equilibrium. Imagine,
+for instance that the the original equilibrium had the country borrowing in
+the multiplicity region, at high spreads, when $b^{0}=0.$ Using the language
+adopted above, in this equilibrium the country was "gambling for
+redemption", at high rates. Imagine, on the other hand, that the country was
+almost indiferent betwen this action and "endogenous austerity". Then, it
+follows that a relatively low value of "catalytic" lending can push the
+country towards "endogenous austerity" and low rates.
+
+\bigskip
+
+Conclusions:
+
+1. The "whatever it takes"\ policy rules out multiple equilibria.
+
+2. The "catalytic" approach moves the multiplicity region and therefore it
+can, well designed, affect the country's actions and therefore the
+equilibrium interest rates. It is conceivable that, as the new rates are
+lower, the country ends up borrowing even more that in the bad equilibrium
+with $b^{0}=0.$
+
+\bigskip
+
+A final point:\ Imagine now that - as it is in reality - an agreement with
+the LOLR implies a commitment to a maximum amount the country can borrow,
+but it is the choice of the country to tap on those finds or not.\footnote{%
+Incidentally, during 1997 and 1998, Argentina had an aggrement with the
+Fund, but did not tap on those, it chose to issue bonds in private markets.
+I\ also think - this must be checked - that Clinton's and the IMF\ support
+package for Mexico, that totalled about 30 billion I\ believe, was not
+totally tapped - and it weas returned completely in about a year.
+\par
+{}}
+
+So far, I\ have assumed that $R^{o}=R^{\ast }.$ Imagine now that $%
+R^{o}=R^{\ast }+\delta ,$ for very small $\delta .$ Clearly, as the
+equilibrium is either $R=R^{\ast }$ or $R=\frac{R^{\ast }}{1-p},$ in the
+good equilibrium, the country would never tap on the funds of the LOLR,
+since it charges a higher rate. However, I\ conjecture that the commitment
+to lend at $R^{o}=R^{\ast }+\delta $ moves the return function $h(R;b,b^{o})$
+in a similar fashion, so it would still imply moving the multiplicity region
+to the right, indusing endogenous austerity, even though the funds are never
+used. One way to prove this conjecture would be by taking the limit when $%
+\delta \rightarrow 0.$
+
+\bigskip
+
+\end{document}
