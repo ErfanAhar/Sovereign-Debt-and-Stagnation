@@ -26,6 +26,12 @@ function build_transition(P_g::AbstractMatrix, P_eps::AbstractMatrix)
     return kron(P_eps, P_g)
 end
 
+function build_transition(P_g::AbstractMatrix, pi_eps::AbstractVector)
+    Ne = length(pi_eps)
+    P_eps = repeat(reshape(pi_eps, 1, Ne), Ne, 1)
+    return kron(P_eps, P_g)
+end
+
 function nearest_index(grid::AbstractVector, values::AbstractArray)
     idx = similar(values, Int)
     n = length(grid)
@@ -59,4 +65,15 @@ function expected_next(v::Array{Float64,3}, P_ge::Matrix{Float64})
     v_mat = reshape(v, Nb, Ng * Ne)
     vE_mat = v_mat * P_ge'
     return reshape(vE_mat, Nb, Ng, Ne)
+end
+
+# Expectation over (g', eps') with iid eps (independent of current eps).
+function expected_next_iid(v::AbstractArray{<:Real,3}, P_g::AbstractMatrix, pi_eps::AbstractVector)
+    Nb, Ng, Ne = size(v)
+    @assert size(P_g, 1) == Ng && size(P_g, 2) == Ng
+    @assert length(pi_eps) == Ne
+    v_mat = reshape(v, Nb * Ng, Ne)
+    v_eps = v_mat * pi_eps
+    v_eps = reshape(v_eps, Nb, Ng)
+    return v_eps * P_g'
 end

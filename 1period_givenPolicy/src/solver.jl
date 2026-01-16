@@ -10,9 +10,10 @@ function _solve_vd!(vd, vnd, model, y, g_beta, imf_net, bprime_idx, kbprime_idx)
             vd_bprime = vd[bprime_idx[:, gi], :, :]
             w_reentry = max.(vnd_kbprime, vd_bprime)
             cont = model.theta .* vd_bprime .+ (1 - model.theta) .* w_reentry
-            contE = expected_next(cont, model.P_ge)
+            contE = expected_next_iid(cont, model.P_g, model.pi_eps)
             udef = u(model.phi_g[gi] .* y[gi, :] .+ imf_net[gi, :], model.gamma)
-            vd_new[:, gi, :] = reshape(udef, 1, Ne) .+ g_beta[gi] .* contE[:, gi, :]
+            contE_g = reshape(contE[:, gi], Nb, 1)
+            vd_new[:, gi, :] = reshape(udef, 1, Ne) .+ g_beta[gi] .* contE_g
         end
         err = maximum(abs.(vd_new .- vd))
         vd .= vd_new
@@ -36,8 +37,9 @@ function _solve_prices!(X, d, e, model, bprime_idx, kbprime_idx)
             e_bprime = e[bprime_idx[:, gi], :, :]
             Q_kbprime = Q[kbprime_idx[:, gi], :, :]
             term = model.theta .* X_bprime .+ (1 - model.theta) .* ((1 .- e_bprime) .* X_bprime .+ e_bprime .* (model.kappa .* Q_kbprime))
-            termE = expected_next(term, model.P_ge)
-            X_new[:, gi, :] = (1 / (1 + model.rstar)) .* termE[:, gi, :]
+            termE = expected_next_iid(term, model.P_g, model.pi_eps)
+            termE_g = reshape(termE[:, gi], Nb, 1)
+            X_new[:, gi, :] .= (1 / (1 + model.rstar)) .* termE_g
         end
         err = maximum(abs.(X_new .- X))
         X .= X_new
@@ -52,38 +54,37 @@ end
 function _compute_schedule(b, g, model, Q, d)
     Nb = length(b)
     Ng = length(g)
-    QE = expected_next(Q, model.P_ge)
+    QE = expected_next_iid(Q, model.P_g, model.pi_eps)
     R = (1 + model.rstar) ./ max.(QE, 1e-8)
-    gb = reshape(b, Nb, 1, 1) .* reshape(g, 1, Ng, 1)
+    gb = reshape(b, Nb, 1) .* reshape(g, 1, Ng)
     n = gb ./ R
-    pdefault = expected_next(Float64.(d), model.P_ge)
+    pdefault = expected_next_iid(Float64.(d), model.P_g, model.pi_eps)
     return QE, R, n, pdefault
 end
 
 function _update_vnd!(vnd, vd, model, b, y, g_beta, imf_net, n, pdefault, b0_idx)
     Nb, Ng, Ne = size(vnd)
     w = max.(vnd, vd)
-    wE = expected_next(w, model.P_ge)
+    wE = expected_next_iid(w, model.P_g, model.pi_eps)
     vnd_new = similar(vnd)
+    bcol = reshape(b, Nb, 1)
     for gi in 1:Ng
-        for ei in 1:Ne
-            n_choice = n[:, gi, ei]
-            wE_choice = wE[:, gi, ei]
-            p_choice = pdefault[:, gi, ei]
-            allowed = (p_choice .<= model.pub) .& (n_choice .<= model.nbar_g[gi])
-            if !any(allowed)
-                allowed[b0_idx] = true
-            end
+        n_choice = n[:, gi]
+        p_choice = pdefault[:, gi]
+        allowed = (p_choice .<= model.pub) .& (n_choice .<= model.nbar_g[gi])
+        if !any(allowed)
+            allowed[b0_idx] = true
+        end
 
-            nrow = reshape(n_choice, 1, Nb)
-            bcol = reshape(b, Nb, 1)
-            c = (y[gi, ei] + imf_net[gi, ei]) .+ nrow .- bcol
+        nrow = reshape(n_choice, 1, Nb)
+        wE_row = reshape(wE[:, gi], 1, Nb)
+        mask = reshape(allowed, 1, Nb)
+        Threads.@threads for ei in 1:Ne
+            c = y[gi, ei] + imf_net[gi, ei] .+ nrow .- bcol
             util = u(c, model.gamma)
-            val = util .+ g_beta[gi] .* reshape(wE_choice, 1, Nb)
-            mask = reshape(allowed, 1, Nb)
+            val = util .+ g_beta[gi] .* wE_row
             val_masked = ifelse.(mask, val, -Inf)
-
-            vnd_new[:, gi, ei] = vec(maximum(val_masked, dims = 2))
+            vnd_new[:, gi, ei] = dropdims(maximum(val_masked, dims = 2), dims = 2)
         end
     end
     err = maximum(abs.(vnd_new .- vnd))
@@ -94,24 +95,24 @@ end
 function _compute_policy_idx(model, b, y, g_beta, imf_net, n, pdefault, vnd, vd, b0_idx)
     Nb, Ng, Ne = size(vnd)
     w = max.(vnd, vd)
-    wE = expected_next(w, model.P_ge)
+    wE = expected_next_iid(w, model.P_g, model.pi_eps)
     b_policy_idx = zeros(Int, Nb, Ng, Ne)
+    bcol = reshape(b, Nb, 1)
     for gi in 1:Ng
-        for ei in 1:Ne
-            n_choice = n[:, gi, ei]
-            wE_choice = wE[:, gi, ei]
-            p_choice = pdefault[:, gi, ei]
-            allowed = (p_choice .<= model.pub) .& (n_choice .<= model.nbar_g[gi])
-            if !any(allowed)
-                allowed[b0_idx] = true
-            end
+        n_choice = n[:, gi]
+        p_choice = pdefault[:, gi]
+        allowed = (p_choice .<= model.pub) .& (n_choice .<= model.nbar_g[gi])
+        if !any(allowed)
+            allowed[b0_idx] = true
+        end
 
-            nrow = reshape(n_choice, 1, Nb)
-            bcol = reshape(b, Nb, 1)
+        nrow = reshape(n_choice, 1, Nb)
+        wE_row = reshape(wE[:, gi], 1, Nb)
+        mask = reshape(allowed, 1, Nb)
+        Threads.@threads for ei in 1:Ne
             c = (y[gi, ei] + imf_net[gi, ei]) .+ nrow .- bcol
             util = u(c, model.gamma)
-            val = util .+ g_beta[gi] .* reshape(wE_choice, 1, Nb)
-            mask = reshape(allowed, 1, Nb)
+            val = util .+ g_beta[gi] .* wE_row
             val_masked = ifelse.(mask, val, -Inf)
 
             idx = findmax(val_masked, dims = 2)[2]
