@@ -3,29 +3,30 @@ using QuantEcon
 
 Base.@kwdef struct Model
     # Grid sizes
-    Nb::Int              # debt grid size
-    Ng::Int               # growth-state grid size
-    Ns::Int               # sunspot-state grid size
-    Ne::Int               # shock grid size
+    Nb::Int = 2000            # debt grid size
+    Ng::Int = 2               # growth-state grid size
+    Ns::Int = 2               # sunspot-state grid size
+    Ne::Int = 17              # shock grid size
 
     # Grids
-    b::Vector{Float64} = collect(range(-0.05, 0.55, length = Nb)) # debt grid
+    b::Vector{Float64} = collect(range(-0.05, 1.0, length = Nb))  # debt grid
     g::Vector{Float64} = [0.96, 1.04]                             # growth states
     eps::Vector{Float64} = collect(range(-0.1, 0.1, length = Ne)) # shock grid
 
     # Transitions
     P_g::Matrix{Float64} = [0.60 0.40; 0.25 0.75]    # growth transition
     pi_eps::Vector{Float64} = fill(1.0 / Ne, Ne)     # iid shock probabilities
-    P_s::Matrix{Float64} = [0.25 0.75; 0.25 0.75]    # sunspot transition (iid default)
+    P_s::Matrix{Float64} = [0.01 0.99; 0.01 0.99]    # sunspot transition (iid default)
+    K::Matrix{Float64} = zeros(0, 0)                # kron(P_s, P_g), filled in init_model
 
     # Preferences and technology
-    beta::Float64 = 0.55                 # discount factor
+    beta::Float64 = 0.75                 # discount factor
     gamma::Float64 = 2.0                 # CRRA risk aversion
     sigma_eps::Float64 = 0.023           # shock scale in output
     rstar::Float64 = 0.01                # world interest rate
     theta::Float64 = 0.1                 # re-entry probability
     kappa::Float64 = 0.75                # debt haircut in default
-    phi_g::Vector{Float64} = [0.985, 0.90] # output loss in default
+    phi_g::Vector{Float64} = [0.95, 0.88] # output loss in default
     nbar_g::Vector{Float64} = [1.0, 1.0] # issuance cap
 
     # IMF policy
@@ -44,31 +45,36 @@ Base.@kwdef struct Model
     tol_x::Float64 = 1e-6             # price tolerance
 end
 
-function init_model(; Nb::Int = 1000, Ne::Int = 15, b_min::Float64 = -0.05, b_max::Float64 = 0.55,
-    g::Vector{Float64} = [0.96, 1.04], P_g::Matrix{Float64} = [0.60 0.40; 0.25 0.75],
-    sigma_eps::Float64 = 0.023, n_std::Float64 = 2.5,
-    pB::Float64 = 0.25, P_s::Union{Nothing, Matrix{Float64}} = nothing,
-    L0::Float64 = 0.0, l_policy::Union{Nothing, Array{Float64,2}} = nothing, kwargs...)
+function init_model()
+    base = Model()
 
+    Nb = base.Nb
+    Ne = base.Ne
+    g = base.g
+    P_g = base.P_g
+    P_s = base.P_s
     Ng = length(g)
-    b = collect(range(b_min, b_max, length = Nb))
+    Ns = size(P_s, 1)
+    b = base.b
+
     sigma_u = 1.0
+    n_std = 2.5
     mc = QuantEcon.tauchen(Ne, 0.0, sigma_u, 0.0, n_std)
     eps = collect(mc.state_values)
     P_eps = mc.p
     P_eps_pow = P_eps^10000
     pi_eps = vec(P_eps_pow[1, :])
     pi_eps ./= sum(pi_eps)
-    if l_policy === nothing
-        l_policy = fill(L0, Ng, Ne)
+
+    l_policy = base.l_policy
+    if size(l_policy) != (Ng, Ne)
+        l_policy = fill(0.0, Ng, Ne)
     end
-    if P_s === nothing
-        P_s = [pB 1 - pB; pB 1 - pB]
-    end
-    Ns = size(P_s, 1)
+
+    K = kron(P_s, P_g)
 
     return Model(; Nb = Nb, Ng = Ng, Ns = Ns, Ne = Ne, b = b, g = g, eps = eps, P_g = P_g,
-        pi_eps = pi_eps, P_s = P_s, sigma_eps = sigma_eps, l_policy = l_policy, kwargs...)
+        pi_eps = pi_eps, P_s = P_s, K = K, l_policy = l_policy)
 end
 
 struct Solution

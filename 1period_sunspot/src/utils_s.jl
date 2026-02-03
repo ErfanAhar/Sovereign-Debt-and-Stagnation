@@ -40,20 +40,16 @@ function nearest_index(grid::AbstractVector, values::AbstractArray)
 end
 
 # Expectation over (g', s', eps') with iid eps and Markov sunspot.
-function expected_next_iid(v::AbstractArray{<:Real,4}, P_g::AbstractMatrix, P_s::AbstractMatrix, pi_eps::AbstractVector)
+function expected_next_iid(v::AbstractArray{<:Real,4}, K::AbstractMatrix, pi_eps::AbstractVector)
     Nb, Ng, Ns, Ne = size(v)
-    @assert size(P_g, 1) == Ng && size(P_g, 2) == Ng
-    @assert size(P_s, 1) == Ns && size(P_s, 2) == Ns
+    @assert size(K, 1) == Ng * Ns && size(K, 2) == Ng * Ns
     @assert length(pi_eps) == Ne
 
     v_mat = reshape(v, Nb * Ng * Ns, Ne)
     v_eps = v_mat * pi_eps
     v_eps = reshape(v_eps, Nb, Ng, Ns)
 
-    vE = similar(v_eps, Float64)
-    Ps_t = P_s'
-    for b in 1:Nb
-        vE[b, :, :] = P_g * v_eps[b, :, :] * Ps_t
-    end
-    return vE
+    v_eps_mat = reshape(v_eps, Nb, Ng * Ns)
+    vE_mat = v_eps_mat * K'
+    return reshape(vE_mat, Nb, Ng, Ns)
 end

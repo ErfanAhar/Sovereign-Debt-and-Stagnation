@@ -1,29 +1,20 @@
-function _enforce_monotone(n::AbstractVector{<:Real}, idxs::AbstractVector{Int};
-    tol::Float64 = 1e-10)
-    mask = falses(length(n))
-    last_n = -Inf
-    for i in idxs
-        if n[i] >= last_n - tol
-            mask[i] = true
-            last_n = n[i]
-        end
-    end
-    return mask
-end
-
-function _branch_masks(n::AbstractVector{<:Real}; tol::Float64 = 1e-10)
+function _bad_branch_mask(n::AbstractVector{<:Real}; tol::Float64 = 1e-10)
     Nb = length(n)
-    dn = diff(n)
-    if all(dn .>= -tol) || all(dn .<= tol)
-        return trues(Nb), trues(Nb)
+    mask = falses(Nb)
+    if Nb == 0
+        return mask
     end
 
-    imax = findmax(n)[2]
-    low_idxs = collect(1:imax)
-    high_idxs = collect(imax:Nb)
-    low_mask = _enforce_monotone(n, low_idxs; tol = tol)
-    high_mask = _enforce_monotone(n, reverse(high_idxs); tol = tol)
-    return low_mask, high_mask
+    kept = Int[]
+    for i in 1:Nb
+        while !isempty(kept) && n[i] < n[kept[end]] - tol
+            pop!(kept)
+        end
+        push!(kept, i)
+    end
+
+    mask[kept] .= true
+    return mask
 end
 
 function _select_schedule_mask(n::Array{Float64,3})
@@ -31,9 +22,13 @@ function _select_schedule_mask(n::Array{Float64,3})
     mask = falses(Nb, Ng, Ns)
     for gi in 1:Ng
         for si in 1:Ns
-            low_mask, high_mask = _branch_masks(view(n, :, gi, si))
-            # s=1 is bad (high-rate schedule), s=2 is good (low-rate schedule)
-            mask[:, gi, si] .= (si == 1) ? high_mask : low_mask
+            if si == 1
+                # bad sunspot: keep monotone nondecreasing n in b' (prefer higher b' on drops)
+                mask[:, gi, si] .= _bad_branch_mask(view(n, :, gi, si))
+            else
+                # good sunspot: everything accessible
+                mask[:, gi, si] .= true
+            end
         end
     end
     return mask
@@ -51,7 +46,7 @@ function _solve_vd!(vd, vnd, model, y, g_beta, imf_net, bprime_idx, kbprime_idx)
             vd_bprime = vd[bprime_idx[:, gi], :, :, :]
             w_reentry = max.(vnd_kbprime, vd_bprime)
             cont = model.theta .* vd_bprime .+ (1 - model.theta) .* w_reentry
-            contE = expected_next_iid(cont, model.P_g, model.P_s, model.pi_eps)
+            contE = expected_next_iid(cont, model.K, model.pi_eps)
             udef = u(model.phi_g[gi] .* y[gi, :] .+ imf_net[gi, :], model.gamma)
             for si in 1:Ns
                 contE_gs = reshape(contE[:, gi, si], Nb, 1)
@@ -80,7 +75,7 @@ function _solve_prices!(X, d, e, model, bprime_idx, kbprime_idx)
             e_bprime = e[bprime_idx[:, gi], :, :, :]
             Q_kbprime = Q[kbprime_idx[:, gi], :, :, :]
             term = model.theta .* X_bprime .+ (1 - model.theta) .* ((1 .- e_bprime) .* X_bprime .+ e_bprime .* (model.kappa .* Q_kbprime))
-            termE = expected_next_iid(term, model.P_g, model.P_s, model.pi_eps)
+            termE = expected_next_iid(term, model.K, model.pi_eps)
             for si in 1:Ns
                 termE_gs = reshape(termE[:, gi, si], Nb, 1)
                 X_new[:, gi, si, :] .= (1 / (1 + model.rstar)) .* termE_gs
@@ -99,18 +94,18 @@ end
 function _compute_schedule(b, g, model, Q, d)
     Nb = length(b)
     Ng = length(g)
-    QE = expected_next_iid(Q, model.P_g, model.P_s, model.pi_eps)
+    QE = expected_next_iid(Q, model.K, model.pi_eps)
     R = (1 + model.rstar) ./ max.(QE, 1e-8)
     gb = reshape(b, Nb, 1, 1) .* reshape(g, 1, Ng, 1)
     n = gb ./ R
-    pdefault = expected_next_iid(Float64.(d), model.P_g, model.P_s, model.pi_eps)
+    pdefault = expected_next_iid(Float64.(d), model.K, model.pi_eps)
     return QE, R, n, pdefault
 end
 
 function _update_vnd!(vnd, vd, model, b, y, g_beta, imf_net, n, pdefault, schedule_mask, b0_idx)
     Nb, Ng, Ns, Ne = size(vnd)
     w = max.(vnd, vd)
-    wE = expected_next_iid(w, model.P_g, model.P_s, model.pi_eps)
+    wE = expected_next_iid(w, model.K, model.pi_eps)
     vnd_new = similar(vnd)
     bcol = reshape(b, Nb, 1)
     for gi in 1:Ng
@@ -142,7 +137,7 @@ end
 function _compute_policy_idx(model, b, y, g_beta, imf_net, n, pdefault, schedule_mask, vnd, vd, b0_idx)
     Nb, Ng, Ns, Ne = size(vnd)
     w = max.(vnd, vd)
-    wE = expected_next_iid(w, model.P_g, model.P_s, model.pi_eps)
+    wE = expected_next_iid(w, model.K, model.pi_eps)
     b_policy_idx = zeros(Int, Nb, Ng, Ns, Ne)
     bcol = reshape(b, Nb, 1)
     for gi in 1:Ng
