@@ -3,7 +3,7 @@ using QuantEcon
 
 Base.@kwdef struct Model
     # Grid sizes
-    Nb::Int = 2000            # debt grid size
+    Nb::Int = 1000            # debt grid size
     Ng::Int = 2               # growth-state grid size
     Ns::Int = 2               # sunspot-state grid size
     Ne::Int = 17              # shock grid size
@@ -16,7 +16,7 @@ Base.@kwdef struct Model
     # Transitions
     P_g::Matrix{Float64} = [0.60 0.40; 0.25 0.75]    # growth transition
     pi_eps::Vector{Float64} = fill(1.0 / Ne, Ne)     # iid shock probabilities
-    P_s::Matrix{Float64} = [0.01 0.99; 0.01 0.99]    # sunspot transition (iid default)
+    P_s::Matrix{Float64} = [0.25 0.75; 0.25 0.75]    # sunspot transition (iid default)
     K::Matrix{Float64} = zeros(0, 0)                # kron(P_s, P_g), filled in init_model
 
     # Preferences and technology
@@ -26,7 +26,7 @@ Base.@kwdef struct Model
     rstar::Float64 = 0.01                # world interest rate
     theta::Float64 = 0.1                 # re-entry probability
     kappa::Float64 = 0.75                # debt haircut in default
-    phi_g::Vector{Float64} = [0.95, 0.88] # output loss in default
+    phi_g::Vector{Float64} = [0.92, 0.88] # output loss in default
     nbar_g::Vector{Float64} = [1.0, 1.0] # issuance cap
 
     # IMF policy
@@ -45,17 +45,19 @@ Base.@kwdef struct Model
     tol_x::Float64 = 1e-6             # price tolerance
 end
 
-function init_model()
-    base = Model()
+function init_model(raw::Model)
+    b = raw.b
+    g = raw.g
+    P_g = raw.P_g
+    P_s = raw.P_s
 
-    Nb = base.Nb
-    Ne = base.Ne
-    g = base.g
-    P_g = base.P_g
-    P_s = base.P_s
+    Nb = length(b)
+    Ne = raw.Ne
     Ng = length(g)
     Ns = size(P_s, 1)
-    b = base.b
+
+    @assert size(P_g) == (Ng, Ng)
+    @assert size(P_s, 1) == size(P_s, 2)
 
     sigma_u = 1.0
     n_std = 2.5
@@ -66,15 +68,18 @@ function init_model()
     pi_eps = vec(P_eps_pow[1, :])
     pi_eps ./= sum(pi_eps)
 
-    l_policy = base.l_policy
-    if size(l_policy) != (Ng, Ne)
-        l_policy = fill(0.0, Ng, Ne)
-    end
+    l_policy = raw.l_policy
+    phi_g = raw.phi_g
+    nbar_g = raw.nbar_g
 
     K = kron(P_s, P_g)
 
     return Model(; Nb = Nb, Ng = Ng, Ns = Ns, Ne = Ne, b = b, g = g, eps = eps, P_g = P_g,
-        pi_eps = pi_eps, P_s = P_s, K = K, l_policy = l_policy)
+        pi_eps = pi_eps, P_s = P_s, K = K, beta = raw.beta, gamma = raw.gamma,
+        sigma_eps = raw.sigma_eps, rstar = raw.rstar, theta = raw.theta, kappa = raw.kappa,
+        phi_g = phi_g, nbar_g = nbar_g, R_l = raw.R_l, l_policy = l_policy, pub = raw.pub,
+        max_iter = raw.max_iter, max_iter_vd = raw.max_iter_vd, max_iter_x = raw.max_iter_x,
+        tol = raw.tol, tol_vd = raw.tol_vd, tol_x = raw.tol_x)
 end
 
 struct Solution

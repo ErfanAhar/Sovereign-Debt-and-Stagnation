@@ -1,0 +1,3 @@
+\beamer@sectionintoc {1}{LOLR Model: Full Setup}{2}{0}{1}
+\beamer@sectionintoc {2}{Sunspot Model Results}{8}{0}{2}
+\beamer@sectionintoc {3}{LOLR Delta Table}{12}{0}{3}

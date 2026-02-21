@@ -3,16 +3,16 @@ using QuantEcon
 
 Base.@kwdef struct Model
     # Grid sizes
-    Nb::Int = 500          # private debt grid size
+    Nb::Int = 1000          # private debt grid size
     Nl::Int = 100          # LOLR debt grid size
     Ng::Int = 2            # growth-state grid size
     Ne::Int = 10           # shock grid size
 
     # Grid bounds
     b_min::Float64 = -0.05
-    b_max::Float64 = 0.85
+    b_max::Float64 = 1.0
     l_min::Float64 = 0.0
-    l_max::Float64 = 0.06
+    l_max::Float64 = 0.0
 
     # Grids
     b::Vector{Float64} = collect(range(b_min, b_max, length = Nb)) # private debt grid
@@ -55,8 +55,7 @@ Base.@kwdef struct Model
     tol_x::Float64 = 1e-6                # price tolerance
 end
 
-function init_model()
-    m = Model()
+function init_model(m::Model = Model())
 
     b = m.b
     l = m.l

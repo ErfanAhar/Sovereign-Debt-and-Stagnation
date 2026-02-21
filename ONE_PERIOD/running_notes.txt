@@ -1,0 +1,9 @@
+
+To discuss with RA
+1) GNU Fortran compiler.  It's free and good.  We'll stick to using this compiler.  Please get it on your computer
+
+2) grid bounds are part of parameter declation.
+3) I kept some parameters that we are not using now, may may eventually 
+
+4) Some functions are in the Toolbox or Toolbox_CE.  Let me know if you don't find them.
+	Among them: vsearch_FET finds the closest point on the grid. 

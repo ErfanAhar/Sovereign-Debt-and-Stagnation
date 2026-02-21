@@ -130,6 +130,7 @@ function _update_vnd!(vnd, vd, model, b, l, y, g_beta, n, pdefault, b0_idx, l0_i
     if !any(l_allowed)
         l_allowed[l0_idx] = true
     end
+    γ = model.gamma
 
     for gi in 1:Ng
         n_choice = n[:, :, gi]
@@ -142,6 +143,7 @@ function _update_vnd!(vnd, vd, model, b, l, y, g_beta, n, pdefault, b0_idx, l0_i
         n_l_vec = (model.g[gi] .* l) ./ model.R_l_nd
         n_choice_plus = n_choice .+ reshape(n_l_vec, 1, Nl)
         wE_scaled = g_beta[gi] .* wE_mat
+
         Threads.@threads for tidx in 1:(Ne * Nl)
             ei = (tidx - 1) ÷ Nl + 1
             li = tidx - (ei - 1) * Nl
@@ -154,7 +156,7 @@ function _update_vnd!(vnd, vd, model, b, l, y, g_beta, n, pdefault, b0_idx, l0_i
                     @inbounds for lprimej in 1:Nl
                         if allowed[bj, lprimej]
                             c = c_base + n_choice_plus[bj, lprimej]
-                            val = u(c, model.gamma) + wE_scaled[bj, lprimej]
+                            val = u(c, γ) + wE_scaled[bj, lprimej]
                             if val > best_val
                                 best_val = val
                             end
@@ -180,6 +182,7 @@ function _compute_policy_idx(model, b, l, y, g_beta, n, pdefault, vnd, vd, b0_id
     if !any(l_allowed)
         l_allowed[l0_idx] = true
     end
+    γ = model.gamma
 
     for gi in 1:Ng
         n_choice = n[:, :, gi]
@@ -206,7 +209,7 @@ function _compute_policy_idx(model, b, l, y, g_beta, n, pdefault, vnd, vd, b0_id
                     @inbounds for lprimej in 1:Nl
                         if allowed[bj, lprimej]
                             c = c_base + n_choice_plus[bj, lprimej]
-                            val = u(c, model.gamma) + wE_scaled[bj, lprimej]
+                            val = u(c, γ) + wE_scaled[bj, lprimej]
                             if val > best_val
                                 best_val = val
                                 best_b = bj

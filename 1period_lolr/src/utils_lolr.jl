@@ -1,11 +1,9 @@
 using LinearAlgebra
 
-function u(c::Real, gamma::Real)
+@inline function u(c::Real, gamma::Real)
+    # NOTE: This assumes gamma != 1.0 (CRRA). If gamma == 1.0, replace with log utility.
     if c <= 0
         return -Inf
-    end
-    if gamma == 1.0
-        return log(c)
     end
     return c^(1 - gamma) / (1 - gamma)
 end

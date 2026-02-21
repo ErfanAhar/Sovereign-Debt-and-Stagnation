@@ -1,0 +1,199 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[strings]{underscore}
+
+\title{LOLR Model and Sunspot Results}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\section{LOLR Model: Full Setup}
+
+\begin{frame}{Economic Environment}
+\small
+\begin{itemize}
+    \item State variables in period $t$: private debt $b_t$, LOLR debt $l_t$, growth state $g_t \in \{g_L,g_H\}$, and transitory shock $\varepsilon_t$.
+    \item Output in repayment: $y_t = g_t \exp(\sigma_\varepsilon \varepsilon_t)$.
+    \item Output in default: $y_t^{D} = \phi_{g_t} y_t$ with state-dependent output loss.
+    \item Growth follows a Markov chain $P_g$; $\varepsilon_t$ is iid with invariant probabilities $\pi_\varepsilon$.
+    \item International lenders are risk-neutral with gross risk-free rate $1+r^\ast$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Government Problem in Repayment}
+\small
+Given current $(b,l,g,\varepsilon)$ and no default, the sovereign chooses next debt $(b',l')$:
+\[
+V^{ND}(b,l,g,\varepsilon)=
+\max_{b',l'}
+\left\{
+u(c)
+\;+\;
+\beta g^{1-\gamma}
+\mathbb{E}\big[\max\{V^{ND}(b',l',g',\varepsilon'),V^D(b',l',g',\varepsilon')\}\big]
+\right\}.
+\]
+Consumption in repayment is
+\[
+c = y - b - l + n(b',l',g) + n_l(l',g),
+\]
+where
+\[
+n(b',l',g)=\frac{g\,b'}{R(b',l',g)}, \qquad
+n_l(l',g)=\frac{g\,l'}{R_l^{ND}}.
+\]
+\end{frame}
+
+\begin{frame}{Government Problem in Default}
+\small
+In default, private market issuance is shut down and the sovereign only chooses LOLR debt:
+\[
+\begin{aligned}
+V^{D}(b,l,g,\varepsilon)=
+\max_{l'}
+\Big\{
+u\!\left(y^D - l + \frac{g\,l'}{R_l^{D}}\right)
+\;+\;
+\beta g^{1-\gamma}\,
+\mathbb{E}\!\left[\theta V^D(\tilde b,\!l',g',\varepsilon')\right.
+\\
+\left.
+\qquad\qquad\qquad\qquad
++\,(1-\theta)\max\{V^{ND}(\kappa \tilde b,\!l',g',\varepsilon'),V^D(\tilde b,\!l',g',\varepsilon')\}
+\right]
+\Big\},
+\end{aligned}
+\]
+with transformed debt states
+\[
+\tilde b = \frac{b}{g}, \qquad \kappa \tilde b \text{ after restructuring on re-entry.}
+\]
+\end{frame}
+
+\begin{frame}{How $Q$ and $X$ Are Built}
+\small
+At current state $(b,\ell,g,\varepsilon)$:
+\[
+d(b,\ell,g,\varepsilon)=\mathbf{1}\{V^{ND}(b,\ell,g,\varepsilon)<V^D(b,\ell,g,\varepsilon)\}.
+\]
+Bond price is the payoff decomposition
+\[
+Q(b,\ell,g,\varepsilon)=(1-d)+d\,X(b,\ell,g,\varepsilon),
+\]
+where:
+\begin{itemize}
+    \item if no default ($d=0$), lenders receive 1;
+    \item if default ($d=1$), lenders receive continuation value $X$.
+\end{itemize}
+Continuation value satisfies
+\[
+X(b,\ell,g,\varepsilon)=\frac{1}{1+r^\ast}\,
+\mathbb{E}\!\left[\theta X' + (1-\theta)\big((1-e')X' + e'\,\kappa\,Q'\big)\mid g\right],
+\]
+with $e'=\mathbf{1}\{V^{ND}(\kappa b',\ell',g',\varepsilon') \ge V^D(b',\ell',g',\varepsilon')\}$.
+
+\medskip
+So in the code, $(Q,X)$ are obtained jointly as a fixed point given current policy rules and the default/re-entry decisions.
+\end{frame}
+
+\begin{frame}{Pricing, Constraints, and LOLR Policy}
+\small
+\begin{itemize}
+    \item Debt price recursion implies $Q=(1-d)+dX$, with default indicator $d=\mathbf{1}\{V^{ND}<V^D\}$.
+    \item Gross market schedule and implied private issuance:
+    \[
+    R(b',l',g)=\frac{1+r^\ast}{\mathbb{E}[Q']},\qquad
+    n(b',l',g)=\frac{g\,b'}{R(b',l',g)}.
+    \]
+    \item Endogenous default probability schedule:
+    \[
+    p^{def}(b',l',g)=\mathbb{E}[d'].
+    \]
+    \item Feasible repayment choices must satisfy:
+    \[
+    p^{def}(b',l',g)\le \bar p_u, \quad
+    n(b',l',g)\le \bar n_g, \quad
+    l' \le \bar l^{ND}.
+    \]
+    \item In default, LOLR borrowing is capped by $l' \le \bar l^{D}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Numerical Solution in the Code}
+\small
+The solver in \texttt{1period\_lolr/src/solver\_lolr.jl} iterates:
+\begin{itemize}
+    \item Solve default value $V^D$ and default-state LOLR policy $l'_D$.
+    \item Update default decision $d$ and re-entry decision $e=1-d$.
+    \item Solve bond-price fixed point for continuation value $X$ and price $Q$.
+    \item Compute schedules $(R,n,p^{def})$.
+    \item Update repayment value $V^{ND}$ under feasibility constraints.
+    \item Recover optimal policy indexes $(b',l')$ for simulation.
+\end{itemize}
+Simulation in \texttt{simulation\_lolr.jl} then generates moments, default episodes, and debt distributions.
+\end{frame}
+
+\section{Sunspot Model Results}
+
+\begin{frame}{Sunspot Outputs Used in This Section}
+\small
+\begin{itemize}
+    \item Moments table file: \texttt{../1period\_sunspot/result/sunspot\_moments\_pb.tex}.
+    \item Policy figure file: \texttt{../1period\_sunspot/result/sunspot\_policy\_2x2.png}.
+    \item The table compares $P_b=25\%$ vs. $P_b=1\%$ for:
+    \begin{itemize}
+        \item First moments.
+        \item Low-growth-state moments.
+        \item High-growth-state moments.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[shrink=18]{Sunspot Moments Table}
+\scriptsize
+\centering
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\input{../1period_sunspot/result/sunspot_moments_pb.tex}
+\endgroup
+\end{frame}
+
+\begin{frame}{Sunspot Optimal Policy: 2x2 Figure}
+\centering
+\includegraphics[width=0.96\textwidth,height=0.78\textheight,keepaspectratio]{../1period_sunspot/result/sunspot_policy_2x2.png}
+\end{frame}
+
+\begin{frame}{Sunspot n and R Figure}
+\centering
+\includegraphics[width=0.96\textwidth,height=0.78\textheight,keepaspectratio]{../1period_sunspot/result/sunspot_nR_2x2.png}
+\end{frame}
+
+\section{LOLR Delta Table}
+
+\begin{frame}{LOLR Policies by $\Delta$ (Spread 0.06)}
+\centering
+\includegraphics[width=0.96\textwidth,height=0.78\textheight,keepaspectratio]{../1period_lolr/results/lolr_policies_by_delta_spread=0.06_gidx=1.png}
+\end{frame}
+
+\begin{frame}[shrink=18]{LOLR Moments by $\Delta$ at Spread 0.06}
+\scriptsize
+\centering
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\input{../1period_lolr/results/lolr_moments_delta_spread=0.06.tex}
+\endgroup
+\end{frame}
+
+\end{document}
