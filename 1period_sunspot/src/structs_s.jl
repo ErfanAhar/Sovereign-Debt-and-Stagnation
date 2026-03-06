@@ -1,7 +1,10 @@
 using LinearAlgebra
 using QuantEcon
 
-Base.@kwdef struct Model
+Base.@kwdef mutable struct Model
+    # State indexing convention used across all arrays:
+    # g-index: 1 = bad growth state (g[1]), 2 = good growth state (g[2]).
+    # s-index: 1 = bad sunspot, 2 = good sunspot.
     # Grid sizes
     Nb::Int = 1000            # debt grid size
     Ng::Int = 2               # growth-state grid size
@@ -14,9 +17,9 @@ Base.@kwdef struct Model
     eps::Vector{Float64} = collect(range(-0.1, 0.1, length = Ne)) # shock grid
 
     # Transitions
-    P_g::Matrix{Float64} = [0.60 0.40; 0.25 0.75]    # growth transition
+    P_g::Matrix{Float64} = [0.60 0.40; 0.25 0.75]    # growth transition P_g[g,g'] (row=current g, col=next g)
     pi_eps::Vector{Float64} = fill(1.0 / Ne, Ne)     # iid shock probabilities
-    P_s::Matrix{Float64} = [0.25 0.75; 0.25 0.75]    # sunspot transition (iid default)
+    P_s::Matrix{Float64} = [0.25 0.75; 0.25 0.75]    # sunspot transition P_s[s,s'] (row=current s, col=next s)
     K::Matrix{Float64} = zeros(0, 0)                # kron(P_s, P_g), filled in init_model
 
     # Preferences and technology
@@ -26,7 +29,7 @@ Base.@kwdef struct Model
     rstar::Float64 = 0.01                # world interest rate
     theta::Float64 = 0.1                 # re-entry probability
     kappa::Float64 = 0.75                # debt haircut in default
-    phi_g::Vector{Float64} = [0.92, 0.88] # output loss in default
+    phi_g::Vector{Float64} = [0.96, 0.94] # default output factor by g: phi_g[1]=bad g, phi_g[2]=good g
     nbar_g::Vector{Float64} = [1.0, 1.0] # issuance cap
 
     # IMF policy
@@ -83,26 +86,29 @@ function init_model(raw::Model)
 end
 
 struct Solution
+    # Array dimension order:
+    # 4D: (b, g, s, eps) with g=1 bad/g=2 good, s=1 bad/s=2 good.
+    # 3D: (b', g, s) with g=1 bad/g=2 good, s=1 bad/s=2 good.
     # Value functions
-    vnd::Array{Float64,4}       # value in repayment
-    vd::Array{Float64,4}        # value in default
+    vnd::Array{Float64,4}       # value in repayment, indexed as (b, g, s, eps)
+    vd::Array{Float64,4}        # value in default, indexed as (b, g, s, eps)
 
     # Default and re-entry
-    d::BitArray{4}              # default indicator
-    e::BitArray{4}              # re-entry indicator
+    d::BitArray{4}              # default indicator, indexed as (b, g, s, eps)
+    e::BitArray{4}              # re-entry indicator, indexed as (b, g, s, eps)
 
     # Prices and schedules
-    Q::Array{Float64,4}         # bond price
-    X::Array{Float64,4}         # continuation price
-    R::Array{Float64,3}         # gross rate schedule
-    n::Array{Float64,3}         # issuance schedule
-    schedule_mask::BitArray{3} # selected schedule by sunspot
+    Q::Array{Float64,4}         # bond price, indexed as (b, g, s, eps)
+    X::Array{Float64,4}         # continuation price, indexed as (b, g, s, eps)
+    R::Array{Float64,3}         # gross rate schedule, indexed as (b', g, s)
+    n::Array{Float64,3}         # issuance schedule, indexed as (b', g, s)
+    schedule_mask::BitArray{3} # selected schedule by sunspot, indexed as (b', g, s)
 
     # Default probabilities
-    pdefault::Array{Float64,3}  # default probability
+    pdefault::Array{Float64,3}  # default probability, indexed as (b', g, s)
 
     # Policy indexes
-    b_policy_idx::Array{Int,4}  # optimal b' index
+    b_policy_idx::Array{Int,4}  # optimal b' index, indexed as (b, g, s, eps)
 
     # Diagnostics
     outer_iters::Int            # number of outer iterations

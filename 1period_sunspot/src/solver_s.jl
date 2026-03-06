@@ -23,8 +23,9 @@ function _select_schedule_mask(n::Array{Float64,3})
     for gi in 1:Ng
         for si in 1:Ns
             if si == 1
-                # bad sunspot: keep monotone nondecreasing n in b' (prefer higher b' on drops)
-                mask[:, gi, si] .= _bad_branch_mask(view(n, :, gi, si))
+                # bad sunspot: select monotone segment only; pub cap is imposed later in `allowed`.
+                monotone_ok = _bad_branch_mask(view(n, :, gi, si))
+                mask[:, gi, si] .= monotone_ok
             else
                 # good sunspot: everything accessible
                 mask[:, gi, si] .= true
@@ -102,7 +103,7 @@ function _compute_schedule(b, g, model, Q, d)
     return QE, R, n, pdefault
 end
 
-function _update_vnd!(vnd, vd, model, b, y, g_beta, imf_net, n, pdefault, schedule_mask, b0_idx)
+function _update_vnd!(vnd,vd, model, b, y, g_beta, imf_net, n, pdefault, schedule_mask, b0_idx;damp::Float64 = 0.5)
     Nb, Ng, Ns, Ne = size(vnd)
     w = max.(vnd, vd)
     wE = expected_next_iid(w, model.K, model.pi_eps)
@@ -130,7 +131,7 @@ function _update_vnd!(vnd, vd, model, b, y, g_beta, imf_net, n, pdefault, schedu
         end
     end
     err = maximum(abs.(vnd_new .- vnd))
-    vnd .= vnd_new
+    @. vnd = (1.0 - damp) * vnd + damp * vnd_new
     return err
 end
 
@@ -166,7 +167,7 @@ function _compute_policy_idx(model, b, y, g_beta, imf_net, n, pdefault, schedule
     return b_policy_idx
 end
 
-function solve_model(model::Model; sol::Union{Nothing, Solution} = nothing)
+function solve_model(model::Model; sol::Union{Nothing, Solution} = nothing, verbose::Bool = true, print_every::Int = 1)
     b = model.b
     g = model.g
     eps = model.eps
@@ -212,8 +213,10 @@ function solve_model(model::Model; sol::Union{Nothing, Solution} = nothing)
     x_iters = Int[]
     outer_times = Float64[]
 
-    for _ in 1:model.max_iter
+    for it in 1:model.max_iter
         t0 = time()
+        # Decrease the update weight on the new iterate from 0.5 to 0.1.
+        damp = max(0.05, 0.9 - 0.0 * ((it - 1) / 10))
         # Step 2: solve for default value
         vd_err, vd_iter = _solve_vd!(vd, vnd, model, y, g_beta, imf_net, bprime_idx, kbprime_idx)
 
@@ -229,13 +232,29 @@ function solve_model(model::Model; sol::Union{Nothing, Solution} = nothing)
         schedule_mask = _select_schedule_mask(n)
 
         # Step 6: update value in repayment
-        err = _update_vnd!(vnd, vd, model, b, y, g_beta, imf_net, n, pdefault, schedule_mask, b0_idx)
+        err = _update_vnd!(
+            vnd, vd, model, b, y, g_beta, imf_net, n, pdefault, schedule_mask, b0_idx;
+            damp = damp,
+        )
         push!(vd_errs, vd_err)
         push!(x_errs, x_err)
         push!(vd_iters, vd_iter)
         push!(x_iters, x_iter)
         push!(outer_errs, err)
-        push!(outer_times, time() - t0)
+        iter_time = time() - t0
+        push!(outer_times, iter_time)
+        if verbose && (it == 1 || it % max(print_every, 1) == 0 || err < model.tol)
+            println(
+                "iter=", it,
+                ", vnd_err=", err,
+                ", vd_err=", vd_err,
+                ", x_err=", x_err,
+                ", vd_iters=", vd_iter,
+                ", x_iters=", x_iter,
+                ", damp=", damp,
+                ", time_s=", iter_time,
+            )
+        end
         if err < model.tol
             break
         end
