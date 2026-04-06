@@ -102,7 +102,7 @@ struct Solution
     X::Array{Float64,4}         # continuation price, indexed as (b, g, s, eps)
     R::Array{Float64,3}         # gross rate schedule, indexed as (b', g, s)
     n::Array{Float64,3}         # issuance schedule, indexed as (b', g, s)
-    schedule_mask::BitArray{3} # selected schedule by sunspot, indexed as (b', g, s)
+    schedule_mask::BitArray{3} # Fortran-style bad-sunspot branch selector, indexed as (b', g, s)
 
     # Default probabilities
     pdefault::Array{Float64,3}  # default probability, indexed as (b', g, s)

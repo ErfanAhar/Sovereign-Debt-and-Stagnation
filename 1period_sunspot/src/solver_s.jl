@@ -1,31 +1,74 @@
-function _bad_branch_mask(n::AbstractVector{<:Real}; tol::Float64 = 1e-10)
+function _increasing_part_mask(n::AbstractVector{<:Real}; window::Int = 2, tol::Float64 = 1e-10)
     Nb = length(n)
     mask = falses(Nb)
     if Nb == 0
         return mask
     end
 
-    kept = Int[]
-    for i in 1:Nb
-        while !isempty(kept) && n[i] < n[kept[end]] - tol
-            pop!(kept)
-        end
-        push!(kept, i)
+    # The old Fortran code marks the "increasing part" using rolling averages
+    # of the issuance schedule on each side of a point.
+    if Nb <= 2 * window
+        mask .= true
+        return mask
     end
 
-    mask[kept] .= true
+    for i in (window + 1):(Nb - window)
+        left_avg = sum(@view n[(i - window):i]) / (window + 1)
+        right_avg = sum(@view n[i:(i + window)]) / (window + 1)
+        if left_avg < right_avg - tol
+            mask[i] = true
+        end
+    end
+
+    mask[1:window] .= mask[window + 1]
+    mask[(Nb - (window - 1)):Nb] .= mask[Nb - window]
     return mask
 end
 
-function _select_schedule_mask(n::Array{Float64,3})
+function _bad_branch_mask(n::AbstractVector{<:Real}, pdefault::AbstractVector{<:Real}, pub::Float64;
+    window::Int = 2, tol::Float64 = 1e-10)
+    Nb = length(n)
+    @assert length(pdefault) == Nb
+
+    # Match the old Fortran schedule logic:
+    # lsch: below the default-probability threshold used during schedule selection
+    # isch: locally increasing part of the issuance correspondence
+    # msch: multiplicity filter that removes points dominated by a later feasible
+    #       point with lower issuance
+    lsch = pdefault .< (0.999 * pub)
+    isch = _increasing_part_mask(n; window = window, tol = tol)
+    lisch = lsch .& isch
+    msch = trues(Nb)
+
+    for i in 1:Nb
+        min_future_n = Inf
+        for j in i:Nb
+            if lisch[j] && n[j] < min_future_n
+                min_future_n = n[j]
+            end
+        end
+        if min_future_n < n[i] - tol
+            msch[i] = false
+        end
+    end
+
+    return msch
+end
+
+function _select_schedule_mask(n::Array{Float64,3}, pdefault::Array{Float64,3}, model)
     Nb, Ng, Ns = size(n)
     mask = falses(Nb, Ng, Ns)
     for gi in 1:Ng
         for si in 1:Ns
             if si == 1
-                # bad sunspot: select monotone segment only; pub cap is imposed later in `allowed`.
-                monotone_ok = _bad_branch_mask(view(n, :, gi, si))
-                mask[:, gi, si] .= monotone_ok
+                # The bad-sunspot branch follows the old Fortran benchmark:
+                # first build the schedule-selection masks, then impose the
+                # actual pub cap later in the repayment-choice problem.
+                mask[:, gi, si] .= _bad_branch_mask(
+                    view(n, :, gi, si),
+                    view(pdefault, :, gi, si),
+                    model.pub,
+                )
             else
                 # good sunspot: everything accessible
                 mask[:, gi, si] .= true
@@ -229,7 +272,7 @@ function solve_model(model::Model; sol::Union{Nothing, Solution} = nothing, verb
 
         # Step 5: schedule, issuance, and default probabilities
         _, R, n, pdefault = _compute_schedule(b, g, model, Q, d)
-        schedule_mask = _select_schedule_mask(n)
+        schedule_mask = _select_schedule_mask(n, pdefault, model)
 
         # Step 6: update value in repayment
         err = _update_vnd!(
@@ -263,7 +306,7 @@ function solve_model(model::Model; sol::Union{Nothing, Solution} = nothing, verb
     # Final policy evaluation
     Q = (1 .- d) .+ d .* X
     _, R, n, pdefault = _compute_schedule(b, g, model, Q, d)
-    schedule_mask = _select_schedule_mask(n)
+    schedule_mask = _select_schedule_mask(n, pdefault, model)
     b_policy_idx = _compute_policy_idx(model, b, y, g_beta, imf_net, n, pdefault, schedule_mask, vnd, vd, b0_idx)
 
     outer_iters = length(outer_errs)
