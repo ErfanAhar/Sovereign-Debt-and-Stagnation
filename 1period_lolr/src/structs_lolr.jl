@@ -29,7 +29,8 @@ Base.@kwdef struct Model
     gamma::Float64 = 2.0                 # CRRA risk aversion
     sigma_eps::Float64 = 0.023           # shock scale in output
     n_std::Float64 = 2.5                 # Tauchen width
-    rstar::Float64 = 0.01                # world interest rate
+    # previous rstar = 0.01
+    rstar::Float64 = 0.035               # world interest rate
     theta::Float64 = 0.1                 # re-entry probability
     kappa::Float64 = 0.75                # debt haircut in default
     phi_g::Vector{Float64} = [0.985, 0.90] # output loss in default

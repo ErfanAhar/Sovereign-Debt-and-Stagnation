@@ -1,0 +1,8 @@
+[deps]
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+QuantEcon = "fcd29c91-0bd7-5a09-975d-7ac3f643a60c"
+
+[compat]
+julia = "1.10"
+JLD2 = "0.6"
+QuantEcon = "0.16"
