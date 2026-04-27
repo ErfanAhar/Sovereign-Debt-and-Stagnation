@@ -25,13 +25,19 @@ end
 function guess_solution(solution_data, model)
     sz4 = (model.Nb, model.Ng, model.Ns, model.Ne)
     sz3 = (model.Nb, model.Ng, model.Ns)
+    vnd = Float64.(solution_data.vnd)
+    vd = Float64.(solution_data.vd)
+    d = vnd .< vd
+    Q = hasproperty(solution_data, :Q) ? Float64.(solution_data.Q) : ones(Float64, sz4)
+    X = ones(Float64, sz4)
+    X[d] .= Q[d]
     return Solution(
-        Float64.(solution_data.vnd),
-        Float64.(solution_data.vd),
-        falses(sz4...),
-        trues(sz4...),
-        ones(Float64, sz4),
-        ones(Float64, sz4),
+        vnd,
+        vd,
+        d,
+        .!d,
+        Q,
+        X,
         ones(Float64, sz3),
         zeros(Float64, sz3),
         falses(sz3...),

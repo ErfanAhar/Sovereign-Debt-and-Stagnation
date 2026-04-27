@@ -23,14 +23,14 @@ Base.@kwdef mutable struct Model
     K::Matrix{Float64} = zeros(0, 0)                # kron(P_s, P_g), filled in init_model
 
     # Preferences and technology
-    beta::Float64 = 0.75                 #* discount factor *
+    beta::Float64 = 0.725                #* discount factor *
     gamma::Float64 = 2.0                 # CRRA risk aversion
     sigma_eps::Float64 = 0.023           # shock scale in output
     # previous rstar = 0.035
     rstar::Float64 = 0.035               # world interest rate
     theta::Float64 = 0.1                 # re-entry probability
     kappa::Float64 = 0.75                # debt haircut in default
-    phi_g::Vector{Float64} = [0.96, 0.94] #* default output factor by g: phi_g[1]=bad g, phi_g[2]=good g *
+    phi_g::Vector{Float64} = [0.93, 0.88] #* default output factor by g: phi_g[1]=bad g, phi_g[2]=good g *
     nbar_g::Vector{Float64} = [1.0, 1.0] # issuance cap
 
     # IMF policy

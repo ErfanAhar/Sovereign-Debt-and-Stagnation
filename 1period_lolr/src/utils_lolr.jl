@@ -64,3 +64,49 @@ function expected_next_iid!(out::AbstractMatrix, v::AbstractArray{<:Real,3},
     mul!(out, v_eps, P_g')
     return out
 end
+
+function fortran_initial_guess(model::Model; debt_weight::Float64 = 0.10, c_floor::Float64 = 1e-8)
+    Nb, Nl, Ng, Ne = model.Nb, model.Nl, model.Ng, model.Ne
+    y = reshape(model.g, Ng, 1) .* exp.(model.sigma_eps .* reshape(model.eps, 1, Ne))
+    l0_idx = findmin(abs.(model.l))[2]
+
+    vnd = Array{Float64}(undef, Nb, Nl, Ng, Ne)
+    for gi in 1:Ng, ei in 1:Ne, li in 1:Nl
+        c = max.(y[gi, ei] .- debt_weight .* model.b .- model.l[li], c_floor)
+        vnd[:, li, gi, ei] .= u.(c, model.gamma) ./ (1 - model.beta)
+    end
+
+    vd = zeros(Float64, Nb, Nl, Ng, Ne)
+    d = falses(Nb, Nl, Ng, Ne)
+    e = trues(Nb, Nl, Ng, Ne)
+    Q = ones(Float64, Nb, Nl, Ng, Ne)
+    X = ones(Float64, Nb, Nl, Ng, Ne)
+    R = ones(Float64, Nb, Nl, Ng)
+    n = zeros(Float64, Nb, Nl, Ng)
+    pdefault = zeros(Float64, Nb, Nl, Ng)
+    b_policy_idx = repeat(reshape(collect(1:Nb), Nb, 1, 1, 1), 1, Nl, Ng, Ne)
+    l_policy_idx = fill(l0_idx, Nb, Nl, Ng, Ne)
+    l_policy_idx_d = fill(l0_idx, Nb, Nl, Ng, Ne)
+
+    return Solution(
+        vnd,
+        vd,
+        d,
+        e,
+        Q,
+        X,
+        R,
+        n,
+        pdefault,
+        b_policy_idx,
+        l_policy_idx,
+        l_policy_idx_d,
+        0,
+        Int[],
+        Int[],
+        Float64[],
+        Float64[],
+        Float64[],
+        Float64[],
+    )
+end

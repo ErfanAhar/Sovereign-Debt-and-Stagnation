@@ -244,7 +244,12 @@ function solve_model(model::Model; sol::Union{Nothing, Solution} = nothing, verb
         @assert size(sol.vd) == (Nb, Ng, Ns, Ne)
         vd = copy(sol.vd)
     end
-    X = ones(Float64, Nb, Ng, Ns, Ne)
+    if sol === nothing || isempty(sol.X)
+        X = ones(Float64, Nb, Ng, Ns, Ne)
+    else
+        @assert size(sol.X) == (Nb, Ng, Ns, Ne)
+        X = copy(sol.X)
+    end
 
     d = falses(Nb, Ng, Ns, Ne)
     e = trues(Nb, Ng, Ns, Ne)
