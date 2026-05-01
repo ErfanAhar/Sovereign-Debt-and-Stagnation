@@ -1,0 +1,218 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[strings]{underscore}
+
+\title{\texttt{s\_lolr}: Model and Simulation Results}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Model}
+\small
+\[
+V^{ND}(b,l,g,s,\varepsilon)=
+\max_{b',l'}
+\left\{
+u(c^{ND})+\beta g^{1-\gamma}\,
+\mathbb{E}\!\left[\max\{V^{ND}(b',l',g',s',\varepsilon'),V^D(b',l',g',s',\varepsilon')\}\mid g,s\right]
+\right\}
+\]
+\[
+c^{ND}=y(g,\varepsilon)-b-l+n(b',l',g,s)+n_l^{ND}(l',g)
+\]
+
+\[
+V^D(b,l,g,s,\varepsilon)=
+\max_{l'}
+\left\{
+u(c^D)+\beta g^{1-\gamma}\,
+\mathbb{E}\!\left[\theta V^D\!\left(\frac{b}{g},l',g',s',\varepsilon'\right)
++(1-\theta)\max\left\{V^{ND}\!\left(\kappa\frac{b}{g},l',g',s',\varepsilon'\right),V^D\!\left(\frac{b}{g},l',g',s',\varepsilon'\right)\right\}\middle| g,s\right]
+\right\}
+\]
+\[
+c^D=\phi_g\,y(g,\varepsilon)-l+n_l^{D}(l',g)
+\]
+\[
+n_l^{ND}(l',g)=\frac{g\,l'}{R_l^{ND}},
+\qquad
+n_l^{D}(l',g)=\frac{g\,l'}{R_l^{D}}
+\]
+\end{frame}
+
+\begin{frame}{Prices and Schedules}
+\small
+\[
+d(b,l,g,s,\varepsilon)=\mathbf{1}\left\{V^D(b,l,g,s,\varepsilon)>V^{ND}(b,l,g,s,\varepsilon)\right\}
+\]
+\[
+Q(b,l,g,s,\varepsilon)=(1-d)+d\,X(b,l,g,s,\varepsilon)
+\]
+\[
+X(b,l,g,s,\varepsilon)=\frac{1}{1+r^\ast}\,
+\mathbb{E}\!\left[
+\theta X'
++(1-\theta)\left((1-e')X'+e'\kappa Q'\right)
+\middle| g,s
+\right]
+\]
+\[
+e'(b',l',g',s',\varepsilon')=
+\mathbf{1}\left\{
+V^{ND}(\kappa b',l',g',s',\varepsilon')\geq V^D(b',l',g',s',\varepsilon')
+\right\}
+\]
+\[
+R(b',l',g,s)=\frac{1+r^\ast}{\mathbb{E}[Q' \mid g,s]},
+\qquad
+n(b',l',g,s)=\frac{g\,b'}{R(b',l',g,s)}
+\]
+\[
+p^{def}(b',l',g,s)=\mathbb{E}[d' \mid g,s]
+\]
+\[
+p^{def}(b',l',g,s)\leq \bar p_b,
+\qquad
+n(b',l',g,s)\leq \bar n_g,
+\qquad
+l' \leq \bar l^{ND}, \bar l^{D}
+\]
+\end{frame}
+
+\begin{frame}[shrink=18]{Simulation Table}
+\hypertarget{main-sim-table}{}
+\scriptsize
+\centering
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\input{../../1period_s_lolr/result/s_lolr_moments_table.tex}
+\endgroup
+
+\medskip
+\hyperlink{transition-table-appendix}{\beamergotobutton{Default Transition Table}}
+\end{frame}
+
+\begin{frame}{Selected Private Schedule}
+\begin{columns}[T,onlytextwidth]
+\column{0.62\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_Rn_eqm_lprime.png}
+
+\column{0.38\textwidth}
+\footnotesize
+\textbf{Construction}
+\begin{itemize}
+    \item Slice: low growth, $\sigma=4\%$, current $b=0$, current $l=0$, middle $\varepsilon$.
+    \item For each candidate private choice $b'$, search over feasible $l'$ and choose
+    \[
+    l^\ast(b')\in\arg\max_{l'} V^{ND}(b',l'\mid b=0,l=0,g,s,\varepsilon).
+    \]
+    \item Plot the matched pair
+    \[
+    \big(n(b',l^\ast(b'),g,s),\,R(b',l^\ast(b'),g,s)\big).
+    \]
+    \item Colors vary $\Delta\in\{0,10,20\%\}$; solid is bad $s$, dashed is good $s$.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Private Borrowing Policy}
+\begin{columns}[T,onlytextwidth]
+\column{0.62\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_nb_eqm_lprime.png}
+
+\column{0.38\textwidth}
+\footnotesize
+\textbf{Construction}
+\begin{itemize}
+    \item Slice: low growth, $\sigma=4\%$, current $l=0$, middle $\varepsilon$.
+    \item For each current $b$, read the solved repayment policies
+    \[
+    b^\ast(b),\ l^\ast(b)
+    \]
+    from \texttt{b\_policy\_idx} and \texttt{l\_policy\_idx}.
+    \item Plot
+    \[
+    n(b)=n\!\left(b^\ast(b),l^\ast(b),g,s\right).
+    \]
+    \item Colors vary $\Delta$; solid is bad $s$, dashed is good $s$.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{LOLR Borrowing Policy}
+\begin{columns}[T,onlytextwidth]
+\column{0.62\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_nl_policy.png}
+
+\column{0.38\textwidth}
+\footnotesize
+\textbf{Construction}
+\begin{itemize}
+    \item Slice: low growth, $\sigma=4\%$, current $l=0$, middle $\varepsilon$.
+    \item Left panel uses repayment LOLR policy
+    \[
+    n_l^{ND}(b)=\frac{g\,l^\ast_{ND}(b)}{R_l^{ND}}
+    \]
+    from \texttt{l\_policy\_idx}.
+    \item Right panel uses default LOLR policy
+    \[
+    n_l^{D}(b)=\frac{g\,l^\ast_{D}(b)}{R_l^{D}}
+    \]
+    from \texttt{l\_policy\_idx\_d}.
+    \item Both panels use the full current $b$ grid.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Default Regions}
+\begin{columns}[T,onlytextwidth]
+\column{0.62\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_default_policy.png}
+
+\column{0.38\textwidth}
+\footnotesize
+\textbf{Construction}
+\begin{itemize}
+    \item Slice: low growth, $\sigma=4\%$, current $l=0$, middle $\varepsilon$.
+    \item Plot the solved default indicator from the Bellman comparison:
+    \[
+    d(b,0,g,s,\varepsilon)=\mathbf{1}\{V^D(b,0,g,s,\varepsilon)>V^{ND}(b,0,g,s,\varepsilon)\}.
+    \]
+    \item X-axis is current private debt $b$ over the full grid.
+    \item Colors vary $\Delta$; solid is bad $s$, dashed is good $s$.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\appendix
+
+\begin{frame}[shrink=18]{Appendix: Default Transition Table}
+\hypertarget{transition-table-appendix}{}
+\scriptsize
+\centering
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.95}
+\input{../../1period_s_lolr/result/s_lolr_transition_table.tex}
+\endgroup
+
+\medskip
+\hyperlink{main-sim-table}{\beamerreturnbutton{Back to Main Table}}
+\end{frame}
+
+\end{document}

@@ -119,7 +119,7 @@ function _solve_prices!(X, d, e, model, bprime_idx, kbprime_idx)
             e_bprime = e[bprime_idx[:, gi], :, :, :]
             Q_kbprime = Q[kbprime_idx[:, gi], :, :, :]
             term = model.theta .* X_bprime .+ (1 - model.theta) .* ((1 .- e_bprime) .* X_bprime .+ e_bprime .* (model.kappa .* Q_kbprime))
-            termE = expected_next_iid(term, model.K, model.pi_eps)
+            termE = expected_next_iid(term, model.K, model.pi_eps)              # Nb * Ng * Ns
             for si in 1:Ns
                 termE_gs = reshape(termE[:, gi, si], Nb, 1)
                 X_new[:, gi, si, :] .= (1 / (1 + model.rstar)) .* termE_gs
