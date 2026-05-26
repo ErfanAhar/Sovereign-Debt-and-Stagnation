@@ -1,0 +1,224 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[strings]{underscore}
+
+\title{\texttt{s\_lolrECB}: ECB Intervention and Simulation Results}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{ECB Model: Sovereign Problem}
+\footnotesize
+\[
+V^{ND}(b,g,s,\varepsilon)=
+\max_{b'}
+\left\{
+u(c^{ND})+\beta g^{1-\gamma}
+\mathbb{E}\!\left[
+\max\{V^{ND}(b',g',s',\varepsilon'),V^D(b',g',s',\varepsilon')\}
+\mid g,s\right]
+\right\}
+\]
+\[
+c^{ND}=y(g,\varepsilon)-b+n(b',g,s),
+\qquad
+y(g,\varepsilon)=g e^{\sigma_\varepsilon\varepsilon},
+\qquad
+n(b',g,s)=\frac{g b'}{R(b',g,s)}
+\]
+\[
+\begin{aligned}
+V^D(b,g,s,\varepsilon)
+={}&u\!\left(\phi_g y(g,\varepsilon)\right)+\beta g^{1-\gamma}
+\mathbb{E}\!\left[
+\theta V^D\!\left(\frac{b}{g},g',s',\varepsilon'\right)\right.\\[-1mm]
+&\left.\quad +(1-\theta)
+\max\!\left\{
+V^{ND}\!\left(\kappa\frac{b}{g},g',s',\varepsilon'\right),
+V^D\!\left(\frac{b}{g},g',s',\varepsilon'\right)
+\right\}
+\middle| g,s
+\right].
+\end{aligned}
+\]
+
+\medskip
+\begin{block}{Key Difference From Direct LOLR Lending}
+There is no sovereign debt state $\ell$: the ECB buys private bonds after market clearing rather
+than lending directly to the sovereign.
+\end{block}
+\end{frame}
+
+\begin{frame}{ECB Facility and the Private-Bond Schedule}
+\small
+\[
+Q(b,g,s,\varepsilon)=(1-d)+dX,
+\qquad
+H(b',g,s)=\frac{\mathbb{E}[Q(b',g',s',\varepsilon')\mid g,s]}{1+r^\ast}
+\]
+\[
+P(g,s)=
+\begin{cases}
+\dfrac{1}{1+r^\ast+\sigma^\ell}, & \text{repayment, }g=g_L,\ s=s_b,\\[5pt]
+0, & \text{otherwise,}
+\end{cases}
+\qquad
+L(b',g,s)=\pi P(g,s)+(1-\pi)H(b',g,s)
+\]
+\[
+R(b',g,s)=\frac{1}{\max\{H(b',g,s),L(b',g,s)\}},
+\qquad
+n(b',g,s)=\frac{g b'}{R(b',g,s)}
+\]
+
+\begin{columns}[T,onlytextwidth]
+\column{0.54\textwidth}
+\begin{block}{Intervention}
+Only lenders holding bonds issued in repayment, low growth, and the bad sunspot
+may use the facility. They queue only if $L>H$.
+\end{block}
+\column{0.43\textwidth}
+\begin{block}{Reported Policy Grid}
+\[
+\begin{aligned}
+\pi&\in\{0,.25,.50,.75,1\},\\
+\sigma^\ell&\in\{.04,.06,.08,.10\}.
+\end{aligned}
+\]
+Baseline: $\pi=.50$, $\sigma^\ell=.04$.
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Baseline Policy: Private Schedule and Issuance}
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolrECB/result/figures/ecb_selected_schedule.png}
+
+{\scriptsize Selected private schedule in low growth}
+
+\column{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolrECB/result/figures/ecb_private_policy.png}
+
+{\scriptsize Equilibrium private borrowing policy}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Baseline Policy: ECB Facility and Default}
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolrECB/result/figures/ecb_facility_payoff.png}
+
+{\scriptsize Hold-versus-facility payoff comparison}
+
+\column{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolrECB/result/figures/ecb_default_and_price.png}
+
+{\scriptsize Default policy and bond price}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Baseline Simulation: Issuance and ECB Support}
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolrECB/result/figures/ecb_issuance_distribution.png}
+
+{\scriptsize Simulated distribution of private issuance}
+
+\column{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolrECB/result/figures/ecb_support_distributions.png}
+
+{\scriptsize Outcomes with and without ECB support}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Baseline Simulation: Growth-Transition Outcomes}
+\centering
+\includegraphics[height=0.77\textheight]{../../1period_s_lolrECB/result/figures/ecb_transition_distributions.png}
+
+{\scriptsize Simulated outcomes around $g_H \rightarrow g_L$ transitions}
+\end{frame}
+
+
+\begin{frame}[shrink=18]{Baseline Table}
+\hypertarget{main-sim-table}{}
+\scriptsize
+\centering
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\input{../../1period_s_lolrECB/result/tables/s_lolrECB_baseline_moments_table.tex}
+\endgroup
+\end{frame}
+
+
+\begin{frame}[shrink=18]{Policy Table}
+\hypertarget{main-sim-table}{}
+\scriptsize
+\centering
+\begingroup
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\input{../../1period_s_lolrECB/result/tables/s_lolrECB_policy_grid_moments_table.tex}
+\endgroup
+
+%\medskip
+%\hyperlink{transition-table-appendix}{\beamergotobutton{Transition Table}}
+%\hspace{0.6em}
+%\hyperlink{all-moments-table-appendix}{\beamergotobutton{test moments}}
+%\hspace{0.6em}
+%\hyperlink{all-transition-table-appendix}{\beamergotobutton{test Transition}}
+%\hspace{0.6em}
+%\hyperlink{sim-var-appendix}{\beamergotobutton{Simulation Variables}}
+\end{frame}
+
+\appendix
+
+
+\begin{frame}{Appendix: Reported Variables}
+\small
+\[
+f_t=g_t b'_t,
+\qquad
+q_t=\frac{1}{R_t},
+\qquad
+n_t=q_t f_t=\frac{g_t b'_t}{R_t},
+\qquad
+q_t b_t=\frac{b_t}{R_t}.
+\]
+\[
+P_t=\frac{1}{1+r^\ast+\sigma^\ell}
+\quad\text{only when}\quad
+d_t=0,\quad g_t=g_L,\quad s_t=s_b.
+\]
+
+\medskip
+\begin{itemize}
+    \item $f_t$ is face value of newly issued private debt.
+    \item $n_t$ is private proceeds raised today.
+    \item ECB intervention changes the private price schedule; it does not create direct sovereign LOLR debt.
+    \item Therefore, the ECB table entries for $\operatorname{avg}(n_\ell/y)$ and
+          $\operatorname{avg}(\ell/y)$ are zero.
+\end{itemize}
+
+\medskip
+\hyperlink{baseline-moments}{\beamerreturnbutton{Back to Baseline Moments}}
+\end{frame}
+
+\end{document}

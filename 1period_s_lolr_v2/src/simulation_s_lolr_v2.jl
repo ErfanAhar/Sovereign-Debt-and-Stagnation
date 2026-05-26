@@ -85,7 +85,7 @@ function simulate(model::Model, sol::Solution; T::Int = 200_000, b0_idx::Int = 1
             n_path[t] = 0.0
             R_path[t] = NaN
             l_idx_next_default = sol.l_policy_idx_d[b_idx, l_idx, g_idx, s_idx, eps_idx]
-            n_l_path[t] = g_val * l[l_idx_next_default] / model.R_l_d
+            n_l_path[t] = g_val * l[l_idx_next_default] / model.R_l
             b_idx_next_default = bprime_idx[b_idx, g_idx]
             kb_idx_next_default = kbprime_idx[b_idx, g_idx]
         else
@@ -93,7 +93,7 @@ function simulate(model::Model, sol::Solution; T::Int = 200_000, b0_idx::Int = 1
             b_idx_next = sol.b_policy_idx[b_idx, l_idx, g_idx, s_idx, eps_idx]
             l_idx_next = sol.l_policy_idx[b_idx, l_idx, g_idx, s_idx, eps_idx]
             n_path[t] = sol.n[b_idx_next, l_idx_next, g_idx, s_idx]
-            n_l_path[t] = g_val * l[l_idx_next] / model.R_l_nd
+            n_l_path[t] = g_val * l[l_idx_next] / model.R_l
             R_path[t] = sol.R[b_idx_next, l_idx_next, g_idx, s_idx]
         end
 
@@ -186,7 +186,7 @@ function summarize_simulation(sim, model::Model; sol::Union{Nothing, Solution} =
         end
 
         f_sample = model.g[g_idx_sample] .* model.b[bprime_idx]
-        qb_sample = f_sample ./ R_sample
+        qb_sample = b_sample ./ R_sample
         qb_to_y = qb_sample ./ y_sample
         f_to_y = f_sample ./ y_sample
         tb_to_y = (b_sample .+ l_sample .- n_sample .- n_l_sample) ./ y_sample

@@ -1,0 +1,376 @@
+%2multibyte Version: 5.50.0.2960 CodePage: 1252
+
+\documentclass[english,12pt,a4paper]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{setspace,amsmath,amsfonts,amssymb,amsthm}
+\usepackage{multirow}
+\usepackage{graphicx,subfig}
+\usepackage{epstopdf}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{setspace}
+\usepackage[capposition=top]{floatrow}
+\usepackage{indentfirst}
+\usepackage{booktabs,dcolumn}
+\usepackage{hyperref}
+
+\setcounter{MaxMatrixCols}{10}
+%TCIDATA{OutputFilter=LATEX.DLL}
+%TCIDATA{Version=5.50.0.2960}
+%TCIDATA{Codepage=1252}
+%TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
+%TCIDATA{BibliographyScheme=Manual}
+%TCIDATA{LastRevised=Wednesday, May 13, 2026 14:13:03}
+%TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
+
+\onehalfspace
+\input{tcilatex}
+\begin{document}
+
+\title{\textbf{Sovereign Default: The Role of Expectations}\thanks{
+We thank Patrick Kehoe for many useful conversations. We also thank the
+associate editor and two referees, as well as Fernando Alvarez, Manuel
+Amador, Cristina Arellano, V.V. Chari, In-Koo Cho, Jonathan Eaton, Carlo
+Galli, Veronica Guerrieri, Jonathan Heathcote, Andy Neumeyer, Fabrizio
+Perri, Martin Uribe, and Vivian Yue for very useful comments. Nicolini and
+Teles would like to acknowledge the support of FCT as well as the ADEMU
+project, \textquotedblleft A Dynamic Economic and Monetary
+Union,\textquotedblright\ funded by the European Union's Horizon 2020
+Program under grant agreement N${\ {}^{\circ }}$ 49396. The views expressed
+herein are those of the authors and not necessarily those of the Federal
+Reserve Bank of Minneapolis, the Federal Reserve System, Banco de Portugal,
+the European System of Central Banks, or the Inter-American Development
+Bank. E-mail addresses: joaoay@iadb.org, gaston.m.navarro@frb.gov,
+juanpa@minneapolisfed.org, pteles@ucp.pt.}}
+\author{Jo\~{a}o Ayres \\
+%EndAName
+{\normalsize {Inter-American Development Bank}}\\
+[1ex] Gaston Navarro \\
+[-0.3ex] {\normalsize {Federal Reserve Board} }\\
+[1ex] Juan Pablo Nicolini \\
+[-0.3ex] {\normalsize {Federal Reserve Bank of Minneapolis and Universidad
+Di Tella} }\\
+[1ex] Pedro Teles \\
+[-0.3ex] {\normalsize {Banco de Portugal, Catolica Lisbon School of Business
+\& Economics, CEPR}}}
+\date{September 2017}
+\maketitle
+
+\begin{abstract}
+In the standard model of sovereign default, as in Aguiar and Gopinath (2006)
+or Arellano (2008), default is driven by fundamentals alone. There is no
+independent role for expectations. We show that small variations of that
+model are consistent with multiple interest rate equilibria, similar to the
+ones found in Calvo (1988). For distributions of output that are commonly
+used in the literature, the high interest rate equilibria have properties
+that make them fragile. Once output is drawn from a distribution with both
+good and bad times, however, it is possible to have robust high interest
+rate equilibria. \smallskip
+
+\noindent \textit{Keywords: } Sovereign default; multiple equilibria; good
+and bad times.
+
+\noindent \textit{JEL Codes: }E44, F34.
+
+\medskip \bigskip
+\end{abstract}
+
+\section{ A two-period model of IMF\ Catalytic role}
+
+We study a two-period endowment economy populated by a representative agent
+that can borrow from a continuum of risk-neutral foreign creditors. The
+utility function of the representative agent is given by 
+\begin{equation*}
+\ln c_{1}+E_{1}\ln c_{2}
+\end{equation*}%
+Income at time 1 is assumed to be equal to $e$ which we assume to be small
+enough so the agent wants to save.
+
+In the second period, the agent receives endowment $y$, which follows 
+\begin{equation*}
+y_{2}=%
+\begin{cases}
+y^{l}, & \text{ with probability }p \\ 
+y^{h}, & \text{ with probability }\left( 1-p\right)%
+\end{cases}%
+\end{equation*}
+
+In period one, the representative agent can borrow $b$ in a noncontingent
+bond in international financial markets.
+
+The risk-neutral gross international interest rate is $R^{\ast }$. \ The
+interest rate charged to the country is given by $R.$
+
+We also allow for an international organization (LOLR) that is willing to
+lend an amount $h$, at an interest rate $R^{I}.$
+
+In period two, after observing the realization of the endowment, the
+borrower decides whether to:
+
+\begin{enumerate}
+\item Pay the debt in full. In this case, consumption is given by%
+\begin{equation*}
+y_{2}-bR-hR^{I}
+\end{equation*}
+
+\item Default only on international lenders. In this case output is given by 
+$y^{d}$ which is lower than the expected value of $y.$ In this case,
+consumption will be%
+\begin{equation*}
+y^{d}-hR^{I}
+\end{equation*}
+
+\item Default on the LOLR is given by a fixed cost $\kappa .$ Thus, \ if
+there is default on both lenders and the financial institution, output is
+equal to consumption and is given by 
+\begin{equation*}
+y^{d}-\kappa 
+\end{equation*}
+\end{enumerate}
+
+Thus, to the extent that the LOLR lends an amount $h$ such that%
+\begin{equation*}
+hR^{I}\leq \kappa ,
+\end{equation*}%
+the country will never default on the LOLR.
+
+Note that a similar environmnet is one in which if there is defaault on
+private bonds, the endowment is $y^{d}$, while if it defaults on the IMF it
+is $y^{d}-\kappa $. Thus, the country could default on private bonds only or
+default on both, since there is no extra cost of defaulting on private bonds.
+
+In what follows, we evaluate the effect on the equilibrium set of different
+values of $(h,R^{I})$ satisfying the inequality above.
+
+Then consumption in the second period depends on the default decision as
+follows:
+
+\begin{eqnarray*}
+c &=&y-hR^{I}-bR\text{ \ \ \ if pays} \\
+c &=&y^{d}-hR^{I}\text{ }\ \ \ \ \ \ \ \ \ \ \text{if default }
+\end{eqnarray*}%
+Then, the country will default when 
+\begin{equation*}
+y^{d}+bR\geq y.
+\end{equation*}%
+Notice that if 
+\begin{equation*}
+y^{d}+bR>y^{2},
+\end{equation*}%
+the ex-ante probability of default is equal to one, so the natural debt
+limit is given by 
+\begin{equation*}
+bR\leq y^{2}-y^{d}
+\end{equation*}
+
+Since creditors are risk neutral, in order for them to be indifferent
+between lending at $R$ or at the risk-free rate $R^{\ast }$, the expected
+return from lending to the borrower must be the same as $R^{\ast }$, so%
+\begin{eqnarray*}
+R &=&R^{\ast }\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ if }bR^{\ast }\leq y^{1}-y^{d}
+\\
+R &=&\frac{R^{\ast }}{(1-p)}\ \ \ \text{if }y^{1}-y^{d}\leq b\frac{R^{\ast }%
+}{(1-p)}\leq y^{2}-y^{d}
+\end{eqnarray*}% 
+or%
+\begin{eqnarray*}
+R &=&R^{\ast }\text{ \ \ \ \ \ \ \ \ \ \ \ if \ }b^{\ast }\leq \frac{%
+y^{1}-y^{d}}{R^{\ast }} \\
+R &=&\frac{R^{\ast }}{(1-p)}\ \ \ \text{if \ }\frac{y^{1}-y^{d}}{R^{\ast }}%
+(1-p)\leq b\leq \frac{y^{2}-y^{d}}{R^{\ast }}(1-p)
+\end{eqnarray*}
+This defines a schedule $b=\left( R\right) $ .
+
+We assume that 
+\begin{equation*}
+(1-p)y^{2}+py^{d}>y^{1}
+\end{equation*}%
+so%
+\begin{equation*}
+(1-p)y^{2}+py^{d}-y^{d}>y^{1}-y^{d}
+\end{equation*}%
+\bigskip or%
+\begin{equation*}
+\left( 1-p\right) \left( y^{2}-y^{d}\right) >y^{1}-y^{d}
+\end{equation*}%
+\bigskip This ensures the schedule is like in the Figures of the JET paper.
+
+We focus on 2 different schedules.
+
+Schedule 1 is given by%
+\begin{eqnarray*}
+R &=&R^{\ast }\text{ \ \ \ \ \ \ \ \ \ \ \ if \ }b^{\ast }\leq \frac{%
+y^{1}-y^{d}}{R^{\ast }} \\
+R &=&\frac{R^{\ast }}{(1-p)}\ \ \ \text{if \ }b>\frac{y^{1}-y^{d}}{R^{\ast }}
+\end{eqnarray*}% 
+while the other schedule is given by 
+\begin{eqnarray*}
+R &=&R^{\ast }\text{ \ \ \ \ \ \ \ \ \ \ \ if \ }b^{\ast }\leq \frac{%
+y^{1}-y^{d}}{R^{\ast }}(1-p) \\
+R &=&\frac{R^{\ast }}{(1-p)}\ \ \ \text{if \ }b>\frac{y^{2}-y^{d}}{R^{\ast }}%
+(1-p)
+\end{eqnarray*}
+
+Given this schedule, the optimal choice of debt by the borrower at period 1
+is to chose $h$ and $b$ to maximize utility: 
+\begin{equation}
+V(R(s),\kappa ,\omega )=\ln (\omega +h+b)+\beta p\max \{\ln
+(y^{1}-hR^{I}-bR(s)),\ln (y^{d}-hR^{I})\}+\beta p\ln (y^{1}-hR^{I}-bR(s)).
+\label{OP1}
+\end{equation}% 
+subject to 
+\begin{equation}
+bR\leq y^{2}-y^{d}  \label{MaxB}
+\end{equation}% 
+\begin{equation}
+hR^{\ast }\leq \kappa ,  \label{MaxA}
+\end{equation}
+
+\subsection{The case in which $R^{I}=R^{\ast }$}
+
+In considering the problem of the country at time zero, we first consider
+the case in which $R^{I}=R^{\ast }.$ Thus, as investors would never lend at
+rates lower than $R^{\ast },$ it is - weakly - optimal for the country to
+borrow from the LOLR\ up the maximum feasible amount.
+
+Then, we can write the problem as to chose $b$ to maximize utility: 
+\begin{equation}
+V(R(s),\kappa ,\omega )=\ln (\omega +\frac{\kappa }{R^{\ast }}+b)+\beta
+p\max \{\ln (y^{1}-\kappa -bR(s)),\ln (y^{d}-\kappa )\}+\beta p\ln
+(y^{1}-\kappa -bR(s)).  \label{OP2}
+\end{equation}% 
+subject to 
+\begin{equation*}
+bR\leq y^{2}-y^{d}
+\end{equation*}% 
+The lending by the LOLR\ is equivalent to increasing the endowment at time
+zero $(\omega )\,$\ and reducing it at time 1. In this case it does it at
+actuarially fair prices. We assume that $\omega $ is small enough relative
+to $y^{1},y^{2}$ so that the country borrows from the IMF all the way to $%
+\frac{\kappa }{R^{\ast }}.$
+
+\bigskip 
+
+In this case, it is trivial to show that an increase in $\kappa $ (weakly)
+reduces $b,$ which implies that the LOLR\ can certainly play a "catalytic"
+role and give incentives to the country to do endogenous austerity instead
+of gambling for redemption. 
+
+To solve this case for given $\kappa $, we proceed as follows:
+
+1. Assume $R=R^{\ast }$ and chose $b$ to max utility ignoring constraint $%
+\left( \ref{MaxB}\right) $. If the optimal solution for $b$ is lower than $%
+\frac{y^{1}-y^{d}}{R^{\ast }}(1-p)$, which is the upper bound of the region
+without multplicity, this is the equilibrium.
+
+2. If not, we need to specify sunspot depenndent policies. 
+
+3. To do so, consider first the bad sunspot. First compute utility setting $%
+b=\frac{y^{1}-y^{d}}{R^{\ast }}(1-p)$ and $R=R^{\ast }.$ This is the utility
+the country obtains with the bad sunspot if it does endogenous austerity.
+Then, assume $R=\frac{R^{\ast }}{1-p}$ and chose the max over choice of $b$
+subject to constraints $\left( \ref{MaxB}\right) $ and $\left( \ref{MaxA}%
+\right) .$ This is the utility the country obtains if going beyond the jump
+in rates. The equilibrium is given by the pair $(b,R)$ corresponding to the
+case that delivers higher utility.
+
+4. Consider now the good sunspot. First compute utility setting $b=\frac{%
+y^{1}-y^{d}}{R^{\ast }}$ and $R=R^{\ast }.$ This is the utility the country
+obtains with the good sunspot if it does endogenous austerity. Then, assume $%
+R=\frac{R^{\ast }}{1-p}$ and chose the max over choice of $b$ subject to
+constraints $\left( \ref{MaxB}\right) $ and $\left( \ref{MaxA}\right) .$
+This is the utility the country obtains if going beyond the jump in rates.
+The equilibrium is given by the pair $(b,R)$ corresponding to the case that
+delivers higher utility.
+
+\bigskip 
+
+\subsection{The case in which $R^{I}>R^{\ast }$}
+
+$\bigskip $
+
+Notation: Consider the plot of the schedules offered by the lenders. Let A
+be the lower bound of the set of values for teh debt such that there is
+multiplicity, and let B be the upper bound of such a set.  
+
+Imagine now the model without the IMF and assume that the equilibrium
+exhibits gambling for redemption. Specifically, assume that the equilibrium
+implies that with the good sunspot, the country borrows all the way to $B$
+at rate $R^{\ast }$, the point at which there would be a jump in the
+interest rate. And assume also that with the bad sunspot, the country
+chooses $\widehat{b}\in (A,B)$ at the high rate $\frac{R^{\ast }}{1-p}.$
+
+Now, assume that the LOLR is willing to lend to this country, at a rate  $%
+R^{I}=R^{\ast }+\varepsilon ,$ for relatively low $\varepsilon ,$ an amount
+up to $\widehat{b}-A.$
+
+Consider now the following allocation: if the good sunspot happens, the
+country borrows $B$ at the rate $R^{\ast },$ and it may eventually tap some
+extra borrowing from the LOLR up to the amount $\frac{\kappa }{R^{\ast }}.$
+
+In contrast, if the bad sunspot happens, the country borrows an amount $A$
+from the private sector, which, for this amount, is willing to lend at the
+low rate $R^{\ast }.$ Then, it borrows from the LOLR to the maximun, that is
+\bigskip $\widehat{b}-A,$ at the rate $R^{I}=R^{\ast }+\varepsilon .$
+
+The country is clearly better of, since in the good sunspot, the marginal
+rate of increasing borrowing is smaller than before, while in the bad
+sunspot it is borrowing the same amount at lower rates.
+
+\bigskip 
+
+Note that this allocation satisfies all the equilibrium conditions we
+described above. However, it is clearly not an equilibrium. Private agents
+have incentives to lend to the country marginal amounts above $A,$ but below 
+$B\,,$ at rates $R^{\ast }<R<R^{\ast }+\varepsilon ,$ and the country would
+be willing to take those loans and reduce the borrowing from the IMF\ one by
+one.
+
+Which is the \ equilibrium? 
+
+A\ better allocation for everybody is for the private lenders to replace all
+the LOLR\ lending at the rate $R,$ with  $R^{\ast }<R<R^{\ast }+\varepsilon .
+$
+
+This is still not an equilibrium yet, since private lenders are making
+profits and the lender may stilll want to tap extra funds from the LOLR.....
+
+At that allocation, private lenders want to cut down rates and they will do
+so until private borrowing is equal to B.
+
+In addition, the country may be willling to tap extra resources from the
+LOLR.
+
+Thus, the equilibrium is the same as with the good sunspot.
+
+\bigskip 
+
+The question is which equilibrum condition are we missing?
+
+I think the problem is in the description of the lenders problem.
+
+By specifying that 
+\begin{equation*}
+R=R^{\ast }(1-P(d=1))
+\end{equation*}% 
+where $P(d=1)$ is the probability of default, we are just imposing that the
+return between two assets is the same. As long as those are the only two
+relevant assets, that condition is necessary and sufficient. But we also
+need that no other possible asset offered by the investors yields strictly
+positive profits and is atractive for the country.
+
+With the LOLR, we also need that 
+\begin{equation*}
+(R^{I}-R)h\leq 0
+\end{equation*}%
+That is, if the country is borrowing positive amounts from the LOLR, it has
+to be the case that $(R^{I}-R)\leq 0.$
+
+\bigskip 
+
+I think we were not imposing this condition so far.
+
+\bigskip 
+
+\bigskip 
+
+\end{document}

@@ -104,7 +104,6 @@ function _solve_vd!(vd, vnd, model, y, g_beta, bprime_idx, kbprime_idx)
     l_prime = model.l
     γ = model.gamma
     l0_idx = argmin(abs.(l))
-    l_last = max(searchsortedlast(l_prime, model.lbar_d), l0_idx)
     l_policy_idx_d = fill(l0_idx, Nb, Nl, Ng, Ns, Ne)
     err = Inf
     w_reentry = Array{Float64}(undef, Nb, Ng, Ns, Ne)
@@ -119,9 +118,10 @@ function _solve_vd!(vd, vnd, model, y, g_beta, bprime_idx, kbprime_idx)
             kbidx = kbprime_idx[:, gi]
             contE_g = Array{Float64}(undef, Nb, Nl, Ns)
             _default_continuation_by_lprime!(contE_g, vd, vnd, model, gi, bidx, kbidx, w_reentry, cont, contE_tmp, contE_tmp_vec)
-            n_l_vec = (model.g[gi] .* l_prime) ./ model.R_l_d
+            n_l_vec = (model.g[gi] .* l_prime) ./ model.R_l
 
             for si in 1:Ns
+                l_last = max(searchsortedlast(l_prime, model.lbar_dgs[2, gi, si]), l0_idx)
                 contE_mat = @view contE_g[:, :, si]
                 g_contE = g_beta[gi] .* contE_mat[:, 1:l_last]
                 for ei in 1:Ne, li in 1:Nl
@@ -226,16 +226,16 @@ function _update_vnd!(vnd, vd, model, y, g_beta, n, pdefault, schedule_mask, b0_
     wE_tmp = Vector{Float64}(undef, Nb * Nl * Ng * Ns)
     expected_next!(wE, w, model.K, model.pi_eps, wE_tmp)
     vnd_new = similar(vnd)
-    l_last = max(searchsortedlast(l_prime, model.lbar_nd), l0_idx)
     γ = model.gamma
 
     for gi in 1:Ng, si in 1:Ns
+        l_last = max(searchsortedlast(l_prime, model.lbar_dgs[1, gi, si]), l0_idx)
         @views n_choice = n[:, :, gi, si]
         @views p_choice = pdefault[:, :, gi, si]
         @views wE_gs = wE[:, :, gi, si]
         @views schedule_mask_gs = schedule_mask[:, :, gi, si]
         allowed = _repayment_choice_mask(model, n_choice, p_choice, schedule_mask_gs, gi, l_last, b0_idx, l0_idx)
-        n_l_vec = (model.g[gi] .* l_prime[1:l_last]) ./ model.R_l_nd
+        n_l_vec = (model.g[gi] .* l_prime[1:l_last]) ./ model.R_l
 
         Threads.@threads for tidx in 1:(Ne * Nl)
             ei = (tidx - 1) ÷ Nl + 1
@@ -287,16 +287,16 @@ function _compute_policy_idx(model::Model, vnd, vd, y, g_beta, n, pdefault, sche
     expected_next!(wE, w, model.K, model.pi_eps, wE_tmp)
     b_policy_idx = fill(b0_idx, Nb, Nl, Ng, Ns, Ne)
     l_policy_idx = fill(l0_idx, Nb, Nl, Ng, Ns, Ne)
-    l_last = max(searchsortedlast(l_prime, model.lbar_nd), l0_idx)
     γ = model.gamma
 
     for gi in 1:Ng, si in 1:Ns
+        l_last = max(searchsortedlast(l_prime, model.lbar_dgs[1, gi, si]), l0_idx)
         @views n_choice = n[:, :, gi, si]
         @views p_choice = pdefault[:, :, gi, si]
         @views wE_gs = wE[:, :, gi, si]
         @views schedule_mask_gs = schedule_mask[:, :, gi, si]
         allowed = _repayment_choice_mask(model, n_choice, p_choice, schedule_mask_gs, gi, l_last, b0_idx, l0_idx)
-        n_l_vec = (model.g[gi] .* l_prime[1:l_last]) ./ model.R_l_nd
+        n_l_vec = (model.g[gi] .* l_prime[1:l_last]) ./ model.R_l
 
         Threads.@threads for tidx in 1:(Ne * Nl)
             ei = (tidx - 1) ÷ Nl + 1

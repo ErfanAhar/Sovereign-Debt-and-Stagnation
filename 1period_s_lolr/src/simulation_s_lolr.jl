@@ -186,7 +186,7 @@ function summarize_simulation(sim, model::Model; sol::Union{Nothing, Solution} =
         end
 
         f_sample = model.g[g_idx_sample] .* model.b[bprime_idx]
-        qb_sample = f_sample ./ R_sample
+        qb_sample = b_sample ./ R_sample
         qb_to_y = qb_sample ./ y_sample
         f_to_y = f_sample ./ y_sample
         tb_to_y = (b_sample .+ l_sample .- n_sample .- n_l_sample) ./ y_sample

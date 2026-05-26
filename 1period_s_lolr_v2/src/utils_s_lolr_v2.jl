@@ -15,9 +15,8 @@ function init_model(m::Model = Model())
     end
     g_bar = dot(pi_g, m.g)
 
-    lbar_nd = m.Δ_nd * g_bar
-    lbar_d = m.Δ_d * g_bar
-    l_max = max(m.l_max, lbar_nd, lbar_d)
+    lbar_dgs = m.Δ_dgs .* g_bar
+    l_max = max(m.l_max, maximum(lbar_dgs))
     l = collect(range(m.l_min, l_max, length = m.Nl))
 
     return Model(
@@ -47,12 +46,9 @@ function init_model(m::Model = Model())
         kappa = m.kappa,
         phi_g = copy(m.phi_g),
         nbar_g = copy(m.nbar_g),
-        R_l_nd = m.R_l_nd,
-        R_l_d = m.R_l_d,
-        Δ_nd = m.Δ_nd,
-        Δ_d = m.Δ_d,
-        lbar_nd = lbar_nd,
-        lbar_d = lbar_d,
+        R_l = m.R_l,
+        Δ_dgs = copy(m.Δ_dgs),
+        lbar_dgs = lbar_dgs,
         pub = m.pub,
         max_iter = m.max_iter,
         max_iter_vd = m.max_iter_vd,

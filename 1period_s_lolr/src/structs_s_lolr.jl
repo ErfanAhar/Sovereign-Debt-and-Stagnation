@@ -49,8 +49,8 @@ Base.@kwdef mutable struct Model
     # LOLR borrowing terms
     R_l_nd::Float64 = 1.08
     R_l_d::Float64 = 1.08
-    Δ_nd::Float64 = 0.02
-    Δ_d::Float64 = 0.02
+    Δ_nd::Float64 = 0.06
+    Δ_d::Float64 = 0.06
     lbar_nd::Float64 = Δ_nd * _stationary_mean_g(g, P_g)
     lbar_d::Float64 = Δ_d * _stationary_mean_g(g, P_g)
 

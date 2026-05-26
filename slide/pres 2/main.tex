@@ -96,119 +96,258 @@ l' \leq \bar l^{ND}, \bar l^{D}
 \begingroup
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{0.92}
-\input{../../1period_s_lolr/result/s_lolr_moments_table.tex}
+\input{../../1period_s_lolr_v2/result/s_lolr_v2_moments_table.tex}
 \endgroup
 
 \medskip
-\hyperlink{transition-table-appendix}{\beamergotobutton{Default Transition Table}}
+\hyperlink{transition-table-appendix}{\beamergotobutton{Transition Table}}
+\hspace{0.6em}
+\hyperlink{all-moments-table-appendix}{\beamergotobutton{test moments}}
+\hspace{0.6em}
+\hyperlink{all-transition-table-appendix}{\beamergotobutton{test Transition}}
+\hspace{0.6em}
+\hyperlink{sim-var-appendix}{\beamergotobutton{Simulation Variables}}
 \end{frame}
 
-\begin{frame}{Selected Private Schedule}
+\begin{frame}{Selected Private Schedule: Baseline vs V2}
 \begin{columns}[T,onlytextwidth]
-\column{0.62\textwidth}
+\column{0.33\textwidth}
 \centering
 \includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_Rn_eqm_lprime.png}
 
-\column{0.38\textwidth}
-\footnotesize
-\textbf{Construction}
+{\scriptsize Fixed LOLR borrowing}
+
+\column{0.33\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr_v2/result/s_lolr_v2_low_growth_selected_schedule.png}
+
+{\scriptsize State-dependent LOLR borrowing}
+
+\column{0.34\textwidth}
+\scriptsize
 \begin{itemize}
-    \item Slice: low growth, $\sigma=4\%$, current $b=0$, current $l=0$, middle $\varepsilon$.
-    \item For each candidate private choice $b'$, search over feasible $l'$ and choose
-    \[
-    l^\ast(b')\in\arg\max_{l'} V^{ND}(b',l'\mid b=0,l=0,g,s,\varepsilon).
-    \]
-    \item Plot the matched pair
-    \[
-    \big(n(b',l^\ast(b'),g,s),\,R(b',l^\ast(b'),g,s)\big).
-    \]
-    \item Colors vary $\Delta\in\{0,10,20\%\}$; solid is bad $s$, dashed is good $s$.
+    \item Conditional private schedule at $l'=0$
+    \item Low growth; vary $b'$ and plot $\left(n(b',0,g,s),R(b',0,g,s)\right)$
+    \item Solid: bad $s$ \quad Dashed: good $s$
+    \item Left colors compare fixed-$\Delta$ models
+    \item Right compares bad/good $s$ within one state-dependent-$\Delta$ model
 \end{itemize}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Private Borrowing Policy}
+\begin{frame}{Private Borrowing Policy: Baseline vs V2}
 \begin{columns}[T,onlytextwidth]
-\column{0.62\textwidth}
+\column{0.33\textwidth}
 \centering
 \includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_nb_eqm_lprime.png}
 
-\column{0.38\textwidth}
-\footnotesize
-\textbf{Construction}
+{\scriptsize Fixed-$\Delta$ models}
+
+\column{0.33\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr_v2/result/s_lolr_v2_low_growth_private_policy.png}
+
+{\scriptsize State-dependent $\Delta$}
+
+\column{0.34\textwidth}
+\scriptsize
+\textbf{}
 \begin{itemize}
-    \item Slice: low growth, $\sigma=4\%$, current $l=0$, middle $\varepsilon$.
-    \item For each current $b$, read the solved repayment policies
-    \[
-    b^\ast(b),\ l^\ast(b)
-    \]
-    from \texttt{b\_policy\_idx} and \texttt{l\_policy\_idx}.
     \item Plot
     \[
-    n(b)=n\!\left(b^\ast(b),l^\ast(b),g,s\right).
+    n(b)=n\!\left(b^\ast(b),l^\ast(b),g,s\right)
     \]
-    \item Colors vary $\Delta$; solid is bad $s$, dashed is good $s$.
+    with current $l=0$ and low growth.
+\end{itemize}
+\textbf{Left: baseline}
+\begin{itemize}
+    \item Separate fixed-$\Delta$ models; colors index $\Delta$.
+    \item Solid/dashed split bad and good $s$.
+\end{itemize}
+\textbf{Right: V2}
+\begin{itemize}
+    \item One model with state-dependent LOLR cap.
+    \item Difference between solid and dashed now comes directly from changing the available LOLR cap across sunspots.
 \end{itemize}
 \end{columns}
 \end{frame}
 
-\begin{frame}{LOLR Borrowing Policy}
+\begin{frame}{LOLR Borrowing Policy: Baseline vs V2}
 \begin{columns}[T,onlytextwidth]
-\column{0.62\textwidth}
+\column{0.33\textwidth}
 \centering
 \includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_nl_policy.png}
 
-\column{0.38\textwidth}
-\footnotesize
-\textbf{Construction}
+{\scriptsize Fixed-$\Delta$ models}
+
+\column{0.33\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr_v2/result/s_lolr_v2_low_growth_lolr_policy.png}
+
+{\scriptsize State-dependent $\Delta$}
+
+\column{0.34\textwidth}
+\scriptsize
+\textbf{}
 \begin{itemize}
-    \item Slice: low growth, $\sigma=4\%$, current $l=0$, middle $\varepsilon$.
-    \item Left panel uses repayment LOLR policy
+    \item Left subpanel:
     \[
     n_l^{ND}(b)=\frac{g\,l^\ast_{ND}(b)}{R_l^{ND}}
     \]
-    from \texttt{l\_policy\_idx}.
-    \item Right panel uses default LOLR policy
+    \item Right subpanel:
     \[
     n_l^{D}(b)=\frac{g\,l^\ast_{D}(b)}{R_l^{D}}
     \]
-    from \texttt{l\_policy\_idx\_d}.
-    \item Both panels use the full current $b$ grid.
+    \item Both use the full current $b$ grid with current $l=0$.
+\end{itemize}
+\textbf{Difference}
+\begin{itemize}
+    \item Baseline colors compare fixed-$\Delta$ models.
+    \item V2 compares bad and good $s$ within one state-dependent-$\Delta$ model, so the sunspot itself changes LOLR access in repayment.
 \end{itemize}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Default Regions}
+\begin{frame}{Default Regions: Baseline vs V2}
 \begin{columns}[T,onlytextwidth]
-\column{0.62\textwidth}
+\column{0.33\textwidth}
 \centering
 \includegraphics[width=\linewidth]{../../1period_s_lolr/result/s_lolr_low_growth_default_policy.png}
 
-\column{0.38\textwidth}
-\footnotesize
-\textbf{Construction}
+{\scriptsize Fixed-$\Delta$ models}
+
+\column{0.33\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr_v2/result/s_lolr_v2_low_growth_default_policy.png}
+
+{\scriptsize State-dependent $\Delta$}
+
+\column{0.34\textwidth}
+\scriptsize
+\textbf{}
 \begin{itemize}
-    \item Slice: low growth, $\sigma=4\%$, current $l=0$, middle $\varepsilon$.
-    \item Plot the solved default indicator from the Bellman comparison:
+    \item Plot
     \[
-    d(b,0,g,s,\varepsilon)=\mathbf{1}\{V^D(b,0,g,s,\varepsilon)>V^{ND}(b,0,g,s,\varepsilon)\}.
+    d(b,0,g,s,\varepsilon)=\mathbf{1}\{V^D>V^{ND}\}
     \]
-    \item X-axis is current private debt $b$ over the full grid.
-    \item Colors vary $\Delta$; solid is bad $s$, dashed is good $s$.
+    over the full current $b$ grid at low growth.
+\end{itemize}
+\textbf{Left: baseline}
+\begin{itemize}
+    \item Different colors are different constant-$\Delta$ models.
+\end{itemize}
+\textbf{Right: V2}
+\begin{itemize}
+    \item Same model in both lines.
+    \item Bad $s$ has higher repayment LOLR cap than good $s$, so any shift is the direct within-model effect of state-dependent access.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{State-Dependent LOLR: Distribution of Private Issuance}
+\begin{columns}[T,onlytextwidth]
+\column{0.7\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr_v2/result/s_lolr_v2_issuance_distribution.png}
+
+\column{0.3\textwidth}
+\scriptsize
+\begin{itemize}
+    \item Histogram of simulated $n_t$
+    \item Low-growth panel on the left
+    \item High-growth panel on the right
+    \item No-default observations only
+    \item Bars show number of observations, not density
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{State-Dependent LOLR: $g_H \rightarrow g_L$ Distributions}
+\begin{columns}[T,onlytextwidth]
+\column{0.7\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../1period_s_lolr_v2/result/s_lolr_v2_transition_distributions.png}
+
+\column{0.3\textwidth}
+\scriptsize
+\begin{itemize}
+    \item Top row: carried debt service $b_t$
+    \item Bottom row: current LOLR issuance $n_{l,t}$
+    \item Left column: all $g_H \rightarrow g_L$ transitions
+    \item Right column: $g_H \rightarrow g_L$ transitions with no default
+    \item Bars show number of observations, not density
 \end{itemize}
 \end{columns}
 \end{frame}
 
 \appendix
 
-\begin{frame}[shrink=18]{Appendix: Default Transition Table}
+\begin{frame}{Appendix: Simulation Variables}
+\hypertarget{sim-var-appendix}{}
+\small
+\[
+f_t =
+\underbrace{g_t}_{\substack{\text{scale} \\ \text{not discounting}}}
+\quad
+\underbrace{b_t'}_{\substack{\text{principal payment} \\ \text{based on budget constraint}}}
+\]
+\[
+q_t = \frac{1}{R_t} = \frac{E_t[Q_{t+1}]}{1+r^*}
+\]
+\[
+q_t b_t = \frac{b_t}{R_t}
+\]
+\[
+n_t = q_t f_t = q_t g_t b_t' = \frac{g_t\, b_t'}{R_t}
+\]
+
+\medskip
+\begin{itemize}
+    \item $f_t$ is the face value of newly issued private debt.
+    \item $n_t$ is private proceeds today from newly issued debt.
+    \item $q_t b_t$ is the market value of inherited private debt.
+\end{itemize}
+
+\medskip
+\hyperlink{main-sim-table}{\beamerreturnbutton{Back to Main Table}}
+\end{frame}
+
+\begin{frame}[shrink=10]{Appendix: Default Transition Table}
 \hypertarget{transition-table-appendix}{}
-\scriptsize
+\tiny
 \centering
 \begingroup
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{0.95}
-\input{../../1period_s_lolr/result/s_lolr_transition_table.tex}
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{0.85}
+\input{../../1period_s_lolr_v2/result/s_lolr_v2_transition_table.tex}
+\endgroup
+
+\medskip
+\hyperlink{main-sim-table}{\beamerreturnbutton{Back to Main Table}}
+\end{frame}
+
+\begin{frame}[shrink=18]{Appendix: All Moments Table}
+\hypertarget{all-moments-table-appendix}{}
+\tiny
+\centering
+\begingroup
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{0.82}
+\input{../../1period_s_lolr_v2/result/s_lolr_v2_all_moments_table.tex}
+\endgroup
+
+\medskip
+\hyperlink{main-sim-table}{\beamerreturnbutton{Back to Main Table}}
+\end{frame}
+
+\begin{frame}[shrink=12]{Appendix: All Transition Table}
+\hypertarget{all-transition-table-appendix}{}
+\tiny
+\centering
+\begingroup
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{0.82}
+\input{../../1period_s_lolr_v2/result/s_lolr_v2_all_transition_table.tex}
 \endgroup
 
 \medskip

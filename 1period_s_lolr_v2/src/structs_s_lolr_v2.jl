@@ -1,8 +1,5 @@
 # Version 2 of the sunspot LOLR model.
-# LOLR quantity limits depend on default status and current sunspot:
-# - default: one common cap
-# - repayment, good sunspot: low cap
-# - repayment, bad sunspot: high cap
+# LOLR quantity limits depend on the current default status and (g, s).
 # State: (b, l, g, s, eps)
 
 function _stationary_mean_g(g::AbstractVector{<:Real}, P_g::AbstractMatrix{<:Real}; iters::Int = 10_000)
@@ -51,14 +48,14 @@ Base.@kwdef mutable struct Model
     nbar_g::Vector{Float64} = [1.0, 1.0]
 
     # LOLR borrowing terms
-    R_l_nd::Float64 = 1.08
-    R_l_d::Float64 = 1.08
-    Δ_nd_good::Float64 = 0.05
-    Δ_nd_bad::Float64 = 0.20
-    Δ_d::Float64 = 0.05
-    lbar_nd_good::Float64 = Δ_nd_good * _stationary_mean_g(g, P_g)
-    lbar_nd_bad::Float64 = Δ_nd_bad * _stationary_mean_g(g, P_g)
-    lbar_d::Float64 = Δ_d * _stationary_mean_g(g, P_g)
+    R_l::Float64 = 1.08
+    # Array order: (d_state, g, s) with d_state = 1 for no default, 2 for default
+    # Default calibration: large cap only in (no default, low growth, bad sunspot).
+    Δ_dgs::Array{Float64,3} = let Δ = fill(0.05, 2, 2, 2)
+        Δ[1, 1, 1] = 0.20
+        Δ
+    end
+    lbar_dgs::Array{Float64,3} = Δ_dgs .* _stationary_mean_g(g, P_g)
 
     # Schedule-selection cutoff
     pub::Float64 = 0.65
